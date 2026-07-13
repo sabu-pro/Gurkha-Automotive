@@ -2,6 +2,10 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/lib/types";
 
+async function getCookieStore() {
+  return cookies();
+}
+
 /**
  * Supabase client for use in Server Components, Route Handlers and
  * Server Actions. Reads/writes the Supabase Auth session via cookies,
@@ -9,8 +13,8 @@ import type { Database } from "@/lib/types";
  * admin or an anonymous visitor. RLS policies enforce the actual
  * access rules — this client never bypasses them.
  */
-export function createClient() {
-  const cookieStore = cookies();
+export async function createClient() {
+  const cookieStore = await getCookieStore();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

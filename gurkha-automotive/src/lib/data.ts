@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Service } from "@/lib/types";
 
 export async function getActiveServices(): Promise<Service[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("services")
     .select("*")

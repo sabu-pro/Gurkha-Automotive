@@ -2,11 +2,11 @@
   "name": "gurkha-automotive-root",
   "private": true,
   "scripts": {
-    "preinstall": "npm --prefix gurkha-automotive install",
-    "dev": "npm --prefix gurkha-automotive run dev",
-    "build": "npm --prefix gurkha-automotive run build",
-    "start": "npm --prefix gurkha-automotive run start",
-    "lint": "npm --prefix gurkha-automotive run lint",
-    "type-check": "npm --prefix gurkha-automotive run type-check"
+    "preinstall": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive install",
+    "dev": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run dev",
+    "build": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run build",
+    "start": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run start",
+    "lint": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run lint",
+    "type-check": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run type-check"
   }
 }

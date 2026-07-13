@@ -6,8 +6,10 @@ import type { Booking, Database, Service } from "@/lib/types";
 
 export const runtime = "nodejs";
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient();
+export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const supabase = await createClient();
+  const { params } = context;
+  const { id } = await params;
 
   const {
     data: { user },
@@ -38,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   const { data: updated, error } = await supabase
     .from("bookings")
     .update(updatePayload)
-    .eq("id", params.id)
+    .eq("id", id)
     .select("*, service:services(*)")
     .single();
 
