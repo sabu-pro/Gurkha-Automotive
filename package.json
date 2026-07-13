@@ -8,5 +8,8 @@
     "start": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run start",
     "lint": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run lint",
     "type-check": "npm --prefix C:/Users/sabut/Downloads/gurkha-automotive/gurkha-automotive run type-check"
+  },
+  "devDependencies": {
+    "eslint": "^10.7.0"
   }
 }
