@@ -24,10 +24,10 @@ export default function LoginForm() {
 
     setLoading(false);
 
-    if (signInError) {
-      setError("Incorrect email or password.");
-      return;
-    }
+   if (signInError) {
+  setError(signInError.message);
+  return;
+}
 
     router.push(redirectedFrom);
     router.refresh();
