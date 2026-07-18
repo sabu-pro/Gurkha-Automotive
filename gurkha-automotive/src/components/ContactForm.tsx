@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { suggestEmailCorrection } from "@/lib/email-suggest";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,7 +64,33 @@ export default function ContactForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="email" className="field-label">Email</label>
-          <input id="email" name="email" type="email" required className="field-input" placeholder="jane@example.com" />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            className="field-input"
+            placeholder="jane@example.com"
+            onChange={() => setEmailSuggestion(null)}
+            onBlur={(e) => setEmailSuggestion(suggestEmailCorrection(e.target.value))}
+          />
+          {emailSuggestion && (
+            <p className="mt-1 text-xs text-rust-600">
+              Did you mean{" "}
+              <button
+                type="button"
+                className="underline"
+                onClick={() => {
+                  const input = document.getElementById("email") as HTMLInputElement | null;
+                  if (input) input.value = emailSuggestion;
+                  setEmailSuggestion(null);
+                }}
+              >
+                {emailSuggestion}
+              </button>
+              ?
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="phone" className="field-label">Phone (optional)</label>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import Calendar from "@/components/Calendar";
 import { formatDateDisplay, formatTimeDisplay } from "@/lib/utils";
+import { suggestEmailCorrection } from "@/lib/email-suggest";
 import type { Service } from "@/lib/types";
 
 type SubmitStatus = "idle" | "submitting" | "success" | "error";
@@ -25,6 +26,7 @@ export default function BookingForm({ services }: { services: Service[] }) {
 
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
 
   const selectedService = useMemo(
     () => services.find((s) => s.id === serviceId) ?? null,
@@ -235,11 +237,36 @@ export default function BookingForm({ services }: { services: Service[] }) {
           </div>
           <div>
             <label htmlFor="customer_phone" className="field-label">Phone</label>
-            <input id="customer_phone" name="customer_phone" type="tel" required className="field-input" />
+            <input id="customer_phone" name="customer_phone" type="tel" required className="field-input" placeholder="04XX XXX XXX" />
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="customer_email" className="field-label">Email</label>
-            <input id="customer_email" name="customer_email" type="email" required className="field-input" />
+            <input
+              id="customer_email"
+              name="customer_email"
+              type="email"
+              required
+              className="field-input"
+              onChange={() => setEmailSuggestion(null)}
+              onBlur={(e) => setEmailSuggestion(suggestEmailCorrection(e.target.value))}
+            />
+            {emailSuggestion && (
+              <p className="mt-1 text-xs text-rust-600">
+                Did you mean{" "}
+                <button
+                  type="button"
+                  className="underline"
+                  onClick={() => {
+                    const input = document.getElementById("customer_email") as HTMLInputElement | null;
+                    if (input) input.value = emailSuggestion;
+                    setEmailSuggestion(null);
+                  }}
+                >
+                  {emailSuggestion}
+                </button>
+                ?
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="vehicle_rego" className="field-label">Vehicle registration</label>

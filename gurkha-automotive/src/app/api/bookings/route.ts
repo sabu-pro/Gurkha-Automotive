@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { bookingRequestSchema } from "@/lib/validation";
+import { bookingRequestSchema, domainAcceptsMail } from "@/lib/validation";
 import { computeEndTime } from "@/lib/availability";
 import { sendBookingReceivedEmails } from "@/lib/email";
 import { timeToMinutes, todayIsoDate } from "@/lib/utils";
@@ -29,6 +29,13 @@ export async function POST(request: NextRequest) {
 
   if (input.booking_date < todayIsoDate()) {
     return NextResponse.json({ error: "Please choose a date that isn't in the past." }, { status: 400 });
+  }
+
+  if (!(await domainAcceptsMail(input.customer_email))) {
+    return NextResponse.json(
+      { error: "That email address doesn't look valid — please check for typos." },
+      { status: 400 }
+    );
   }
 
   const supabase = createAdminClient();

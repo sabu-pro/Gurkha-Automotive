@@ -2,13 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getResendClient } from "@/lib/resend";
 import { BUSINESS } from "@/lib/constants";
+import { domainAcceptsMail, optionalPhoneSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
 
 const contactSchema = z.object({
   name: z.string().trim().min(2, "Please enter your name.").max(120),
   email: z.string().trim().email("Please enter a valid email address."),
-  phone: z.string().trim().max(20).optional().or(z.literal("")),
+  phone: optionalPhoneSchema,
   message: z.string().trim().min(5, "Please enter a message.").max(2000),
 });
 
@@ -29,6 +30,14 @@ export async function POST(request: NextRequest) {
   }
 
   const { name, email, phone, message } = parsed.data;
+
+  if (!(await domainAcceptsMail(email))) {
+    return NextResponse.json(
+      { error: "That email address doesn't look valid — please check for typos." },
+      { status: 400 }
+    );
+  }
+
   const garageInbox = process.env.GARAGE_NOTIFICATION_EMAIL;
   const fromAddress = process.env.RESEND_FROM_EMAIL ?? "Gurkha Automotive <onboarding@resend.dev>";
 
