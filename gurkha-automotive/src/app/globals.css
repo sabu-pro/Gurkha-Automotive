@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply bg-cream-200 text-asphalt-800 font-body antialiased;
+    @apply bg-white text-asphalt-800 font-body antialiased;
   }
 
   h1,
@@ -19,7 +19,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid #F2A71B;
+    outline: 2px solid #1E7A3C;
     outline-offset: 2px;
   }
 
@@ -41,15 +41,19 @@
   }
 
   .eyebrow {
-    @apply text-xs font-bold uppercase tracking-[0.2em] text-amber-500;
+    @apply text-xs font-bold uppercase tracking-[0.2em] text-pit-500;
+  }
+
+  .eyebrow-on-dark {
+    @apply text-xs font-bold uppercase tracking-[0.2em] text-pit-400;
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-amber-500 px-6 py-3 text-sm font-bold uppercase tracking-wide text-asphalt-900 transition-colors hover:bg-amber-400 focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-sm bg-pit-500 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-pit-600 focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-cream-100/30 bg-transparent px-6 py-3 text-sm font-bold uppercase tracking-wide text-cream-100 transition-colors hover:border-amber-500 hover:text-amber-400 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border border-cream-100/30 bg-transparent px-6 py-3 text-sm font-bold uppercase tracking-wide text-cream-100 transition-colors hover:border-pit-400 hover:text-pit-400 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-dark {
@@ -61,7 +65,7 @@
   }
 
   .field-input {
-    @apply w-full rounded-sm border border-cream-300 bg-white px-3.5 py-2.5 text-sm text-asphalt-800 placeholder:text-steel-400/60 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500;
+    @apply w-full rounded-sm border border-cream-300 bg-white px-3.5 py-2.5 text-sm text-asphalt-800 placeholder:text-steel-400/60 transition-colors focus:border-pit-500 focus:outline-none focus:ring-1 focus:ring-pit-500;
   }
 
   .hazard-divider {
@@ -69,6 +73,6 @@
   }
 
   .card-panel {
-    @apply rounded-sm border border-cream-300 bg-white shadow-panel;
+    @apply rounded-md border border-cream-300 bg-white shadow-panel transition-shadow;
   }
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -18,16 +19,17 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-asphalt-600 bg-asphalt-800">
-      <div className="hazard-divider" />
-      <div className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <span className="grid h-9 w-9 place-items-center rounded-sm bg-amber-500 font-display text-lg font-bold text-asphalt-900">
-            GA
-          </span>
-          <span className="font-display text-lg font-semibold uppercase tracking-wide text-cream-100">
-            {BUSINESS.name}
-          </span>
+    <header className="sticky top-0 z-50 border-b border-cream-300 bg-white/95 backdrop-blur">
+      <div className="container-page flex h-20 items-center justify-between">
+        <Link href="/" className="flex items-center" onClick={() => setOpen(false)}>
+          <Image
+            src="/logo.png"
+            alt={BUSINESS.name}
+            width={725}
+            height={229}
+            priority
+            className="h-11 w-auto sm:h-12"
+          />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
@@ -36,8 +38,10 @@ export default function Header() {
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-semibold uppercase tracking-wide transition-colors hover:text-amber-400",
-                pathname === link.href ? "text-amber-500" : "text-cream-100/85"
+                "border-b-2 pb-1 text-sm font-semibold uppercase tracking-wide transition-colors hover:text-pit-600",
+                pathname === link.href
+                  ? "border-pit-500 text-asphalt-800"
+                  : "border-transparent text-steel-500"
               )}
             >
               {link.label}
@@ -45,10 +49,10 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-5 md:flex">
           <a
             href={BUSINESS.phoneHref}
-            className="font-mono text-sm font-semibold text-cream-100/90 hover:text-amber-400"
+            className="font-mono text-sm font-semibold text-steel-600 hover:text-pit-600"
           >
             {BUSINESS.phone}
           </a>
@@ -59,7 +63,7 @@ export default function Header() {
 
         <button
           type="button"
-          className="grid h-10 w-10 place-items-center text-cream-100 md:hidden"
+          className="grid h-10 w-10 place-items-center text-asphalt-800 md:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -77,7 +81,7 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-asphalt-600 bg-asphalt-800 md:hidden">
+        <div className="border-t border-cream-300 bg-white md:hidden">
           <nav className="container-page flex flex-col gap-1 py-4">
             {NAV_LINKS.map((link) => (
               <Link
@@ -86,13 +90,13 @@ export default function Header() {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "rounded-sm px-2 py-2.5 text-sm font-semibold uppercase tracking-wide",
-                  pathname === link.href ? "text-amber-500" : "text-cream-100/85"
+                  pathname === link.href ? "text-pit-600" : "text-steel-600"
                 )}
               >
                 {link.label}
               </Link>
             ))}
-            <a href={BUSINESS.phoneHref} className="px-2 py-2.5 font-mono text-sm text-cream-100/85">
+            <a href={BUSINESS.phoneHref} className="px-2 py-2.5 font-mono text-sm text-steel-600">
               {BUSINESS.phone}
             </a>
             <Link href="/book" className="btn-primary mt-2" onClick={() => setOpen(false)}>

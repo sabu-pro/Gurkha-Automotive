@@ -36,12 +36,12 @@ export default async function HomePage() {
         />
         <div className="container-page relative grid gap-12 py-20 md:grid-cols-2 md:items-center md:py-28">
           <div>
-            <span className="eyebrow">Sunshine North, VIC</span>
+            <span className="eyebrow-on-dark">Sunshine North, VIC</span>
             <h1 className="mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight sm:text-5xl">
               Honest mechanical
               <br />
               work, done right
-              <span className="text-amber-500">.</span>
+              <span className="text-rust-500">.</span>
             </h1>
             <p className="mt-6 max-w-md text-base leading-relaxed text-cream-100/70">
               {BUSINESS.name} services, inspects and repairs vehicles for the local
@@ -60,7 +60,7 @@ export default async function HomePage() {
           <div className="relative">
             <div className="hazard-divider mb-0" />
             <div className="card-panel !rounded-none !border-0 bg-asphalt-700 p-8">
-              <span className="eyebrow">Workshop Hours</span>
+              <span className="eyebrow-on-dark">Workshop Hours</span>
               <ul className="mt-4 space-y-2">
                 {OPENING_HOURS.map((h) => (
                   <li
@@ -85,7 +85,7 @@ export default async function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="bg-cream-200 py-20">
+      <section className="bg-white py-20">
         <div className="container-page">
           <span className="eyebrow">Why Gurkha Automotive</span>
           <h2 className="mt-3 max-w-xl font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
@@ -93,7 +93,7 @@ export default async function HomePage() {
           </h2>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
-              <div key={f.title} className="border-t-4 border-amber-500 bg-white p-6 shadow-panel">
+              <div key={f.title} className="border-t-4 border-pit-500 bg-white p-6 shadow-panel transition-shadow hover:shadow-lg">
                 <h3 className="font-display text-lg font-semibold uppercase text-asphalt-800">
                   {f.title}
                 </h3>
@@ -106,16 +106,16 @@ export default async function HomePage() {
 
       {/* Services preview */}
       {featuredServices.length > 0 && (
-        <section className="bg-asphalt-900 py-20">
+        <section className="bg-cream-300 py-20">
           <div className="container-page">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <span className="eyebrow">Popular Services</span>
-                <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-cream-100 sm:text-4xl">
+                <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
                   What we can help with
                 </h2>
               </div>
-              <Link href="/services" className="btn-secondary">
+              <Link href="/services" className="btn-dark">
                 View All Services
               </Link>
             </div>
@@ -129,17 +129,17 @@ export default async function HomePage() {
       )}
 
       {/* CTA banner */}
-      <section className="bg-amber-500">
+      <section className="bg-asphalt-800">
         <div className="container-page flex flex-col items-center justify-between gap-6 py-12 text-center md:flex-row md:text-left">
           <div>
-            <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-asphalt-900 sm:text-3xl">
+            <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl">
               Ready to book your vehicle in?
             </h2>
-            <p className="mt-1 text-sm font-medium text-asphalt-800/80">
+            <p className="mt-1 text-sm font-medium text-cream-100/70">
               Pick a service and time that works for you — takes about two minutes.
             </p>
           </div>
-          <Link href="/book" className="btn-dark shrink-0">
+          <Link href="/book" className="btn-primary shrink-0">
             Book Appointment
           </Link>
         </div>

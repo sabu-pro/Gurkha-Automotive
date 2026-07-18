@@ -16,7 +16,7 @@ export default async function BookPage() {
     <>
       <section className="bg-asphalt-800 py-16 text-cream-100">
         <div className="container-page">
-          <span className="eyebrow">Book Online</span>
+          <span className="eyebrow-on-dark">Book Online</span>
           <h1 className="mt-3 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">
             Book Your Appointment
           </h1>

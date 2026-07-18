@@ -14,7 +14,7 @@ export default function ContactPage() {
     <>
       <section className="bg-asphalt-800 py-16 text-cream-100">
         <div className="container-page">
-          <span className="eyebrow">Get In Touch</span>
+          <span className="eyebrow-on-dark">Get In Touch</span>
           <h1 className="mt-3 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">
             Contact Us
           </h1>
@@ -36,7 +36,7 @@ export default function ContactPage() {
                 <div>
                   <dt className="font-bold text-asphalt-800">Phone</dt>
                   <dd>
-                    <a href={BUSINESS.phoneHref} className="hover:text-amber-600">
+                    <a href={BUSINESS.phoneHref} className="hover:text-pit-600">
                       {BUSINESS.phone}
                     </a>
                   </dd>

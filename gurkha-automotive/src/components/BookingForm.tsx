@@ -141,7 +141,7 @@ export default function BookingForm({ services }: { services: Service[] }) {
               className={[
                 "cursor-pointer rounded-sm border p-4 transition-colors",
                 serviceId === service.id
-                  ? "border-amber-500 bg-amber-500/10"
+                  ? "border-pit-500 bg-pit-500/10"
                   : "border-cream-300 bg-white hover:border-steel-400/50",
               ].join(" ")}
             >
@@ -209,8 +209,8 @@ export default function BookingForm({ services }: { services: Service[] }) {
                       className={[
                         "rounded-sm border px-2 py-2 font-mono text-xs font-semibold transition-colors",
                         selectedTime === slot
-                          ? "border-amber-500 bg-amber-500 text-asphalt-900"
-                          : "border-cream-300 text-asphalt-800 hover:border-amber-500",
+                          ? "border-pit-500 bg-pit-500 text-white"
+                          : "border-cream-300 text-asphalt-800 hover:border-pit-500",
                       ].join(" ")}
                     >
                       {formatTimeDisplay(slot)}

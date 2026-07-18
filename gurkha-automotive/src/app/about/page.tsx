@@ -12,7 +12,7 @@ export default function AboutPage() {
     <>
       <section className="bg-asphalt-800 py-16 text-cream-100">
         <div className="container-page">
-          <span className="eyebrow">About Us</span>
+          <span className="eyebrow-on-dark">About Us</span>
           <h1 className="mt-3 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">
             {BUSINESS.name}
           </h1>
@@ -57,7 +57,7 @@ export default function AboutPage() {
                 "Pre-purchase inspections",
               ].map((item) => (
                 <li key={item} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 shrink-0 bg-amber-500" />
+                  <span className="h-1.5 w-1.5 shrink-0 bg-pit-500" />
                   {item}
                 </li>
               ))}
@@ -73,14 +73,14 @@ export default function AboutPage() {
             </p>
             <a
               href={BUSINESS.phoneHref}
-              className="mt-4 block font-mono text-sm font-semibold text-steel-600 hover:text-amber-600"
+              className="mt-4 block font-mono text-sm font-semibold text-steel-600 hover:text-pit-600"
             >
               {BUSINESS.phone}
             </a>
             <Link href="/book" className="btn-dark mt-6 w-full">
               Book an Appointment
             </Link>
-            <Link href="/contact" className="btn-secondary mt-3 w-full !border-steel-400/40 !text-asphalt-800 hover:!border-amber-500 hover:!text-amber-600">
+            <Link href="/contact" className="btn-secondary mt-3 w-full !border-steel-400/40 !text-asphalt-800 hover:!border-pit-500 hover:!text-pit-600">
               Get in Touch
             </Link>
           </aside>

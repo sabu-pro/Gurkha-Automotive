@@ -44,7 +44,7 @@ export default function Calendar({ selectedDate, onSelectDate, isDayDisabled }: 
           type="button"
           onClick={() => canGoPrev && setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
           disabled={!canGoPrev}
-          className="grid h-8 w-8 place-items-center rounded-sm border border-cream-300 text-steel-600 hover:border-amber-500 hover:text-amber-600 disabled:opacity-30"
+          className="grid h-8 w-8 place-items-center rounded-sm border border-cream-300 text-steel-600 hover:border-pit-500 hover:text-pit-600 disabled:opacity-30"
           aria-label="Previous month"
         >
           ‹
@@ -55,7 +55,7 @@ export default function Calendar({ selectedDate, onSelectDate, isDayDisabled }: 
         <button
           type="button"
           onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))}
-          className="grid h-8 w-8 place-items-center rounded-sm border border-cream-300 text-steel-600 hover:border-amber-500 hover:text-amber-600"
+          className="grid h-8 w-8 place-items-center rounded-sm border border-cream-300 text-steel-600 hover:border-pit-500 hover:text-pit-600"
           aria-label="Next month"
         >
           ›
@@ -91,9 +91,9 @@ export default function Calendar({ selectedDate, onSelectDate, isDayDisabled }: 
                 "aspect-square rounded-sm text-sm font-semibold transition-colors",
                 disabled
                   ? "cursor-not-allowed text-steel-400/40"
-                  : "text-asphalt-800 hover:bg-amber-100",
-                isSelected ? "!bg-amber-500 text-asphalt-900" : "",
-                isToday && !isSelected ? "ring-1 ring-inset ring-amber-500/60" : "",
+                  : "text-asphalt-800 hover:bg-pit-500/10",
+                isSelected ? "!bg-pit-500 text-white" : "",
+                isToday && !isSelected ? "ring-1 ring-inset ring-pit-500/60" : "",
               ].join(" ")}
             >
               {date.getDate()}
