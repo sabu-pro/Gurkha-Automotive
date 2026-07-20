@@ -49,12 +49,15 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-5 md:flex">
+        <div className="hidden items-center gap-3 md:flex">
           <a
             href={BUSINESS.phoneHref}
-            className="font-mono text-sm font-semibold text-steel-600 hover:text-pit-600"
+            className="inline-flex items-center gap-2 rounded-sm border border-asphalt-800/15 px-5 py-3 text-sm font-bold uppercase tracking-wide text-asphalt-800 transition-colors hover:border-pit-500 hover:text-pit-600"
           >
-            {BUSINESS.phone}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1.1l-2.3 2.1z" />
+            </svg>
+            Call Us
           </a>
           <Link href="/book" className="btn-primary">
             Book Now
@@ -96,8 +99,15 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <a href={BUSINESS.phoneHref} className="px-2 py-2.5 font-mono text-sm text-steel-600">
-              {BUSINESS.phone}
+            <a
+              href={BUSINESS.phoneHref}
+              onClick={() => setOpen(false)}
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-sm border border-asphalt-800/15 px-2 py-2.5 text-sm font-bold uppercase tracking-wide text-asphalt-800"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1.1l-2.3 2.1z" />
+              </svg>
+              Call Us
             </a>
             <Link href="/book" className="btn-primary mt-2" onClick={() => setOpen(false)}>
               Book Now
