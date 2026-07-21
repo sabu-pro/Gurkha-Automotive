@@ -1,18 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BUSINESS, OPENING_HOURS } from "@/lib/constants";
+import Reveal from "@/components/Reveal";
 
 export default function Footer() {
   return (
     <footer className="bg-asphalt-900 text-cream-100">
-      <div className="container-page grid gap-10 py-14 md:grid-cols-3">
+      <Reveal className="container-page grid gap-10 py-14 md:grid-cols-3">
         <div>
           <Image
             src="/logo.png"
             alt={BUSINESS.name}
             width={725}
             height={229}
-            className="h-10 w-auto"
+            className="h-10 w-auto transition-transform duration-300 ease-premium hover:scale-105"
           />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-100/60">
             Straightforward vehicle servicing and repairs for Sunshine North and the
@@ -54,7 +55,7 @@ export default function Footer() {
             ))}
           </ul>
         </div>
-      </div>
+      </Reveal>
 
       <div className="border-t border-asphalt-600 py-6">
         <div className="container-page flex flex-col items-center justify-between gap-2 text-xs text-cream-100/40 sm:flex-row">

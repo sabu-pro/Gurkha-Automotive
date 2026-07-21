@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BUSINESS, OPENING_HOURS } from "@/lib/constants";
 import { getActiveServices } from "@/lib/data";
 import ServiceCard from "@/components/ServiceCard";
+import Reveal from "@/components/Reveal";
 
 const FEATURES = [
   {
@@ -36,18 +37,18 @@ export default async function HomePage() {
         />
         <div className="container-page relative grid gap-12 py-20 md:grid-cols-2 md:items-center md:py-28">
           <div>
-            <span className="eyebrow-on-dark">Sunshine North, VIC</span>
-            <h1 className="mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight sm:text-5xl">
+            <span className="eyebrow-on-dark animate-fade-up block">Sunshine North, VIC</span>
+            <h1 className="animate-fade-up mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight [animation-delay:100ms] sm:text-5xl">
               Honest mechanical
               <br />
               work, done right
               <span className="text-rust-500">.</span>
             </h1>
-            <p className="mt-6 max-w-md text-base leading-relaxed text-cream-100/70">
+            <p className="animate-fade-up mt-6 max-w-md text-base leading-relaxed text-cream-100/70 [animation-delay:200ms]">
               {BUSINESS.name} services, inspects and repairs vehicles for the local
               community. Book your appointment online in a couple of minutes.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="animate-fade-up mt-8 flex flex-wrap gap-4 [animation-delay:300ms]">
               <Link href="/book" className="btn-primary">
                 Book an Appointment
               </Link>
@@ -57,7 +58,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="animate-fade-up relative [animation-delay:150ms]">
             <div className="hazard-divider mb-0" />
             <div className="card-panel !rounded-none !border-0 bg-asphalt-700 p-8">
               <span className="eyebrow-on-dark">Workshop Hours</span>
@@ -87,18 +88,22 @@ export default async function HomePage() {
       {/* Features */}
       <section className="bg-white py-20">
         <div className="container-page">
-          <span className="eyebrow">Why Gurkha Automotive</span>
-          <h2 className="mt-3 max-w-xl font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
-            Reliable work, fair pricing
-          </h2>
+          <Reveal>
+            <span className="eyebrow">Why Gurkha Automotive</span>
+            <h2 className="mt-3 max-w-xl font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
+              Reliable work, fair pricing
+            </h2>
+          </Reveal>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="border-t-4 border-pit-500 bg-white p-6 shadow-panel transition-shadow hover:shadow-lg">
-                <h3 className="font-display text-lg font-semibold uppercase text-asphalt-800">
-                  {f.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-steel-500">{f.body}</p>
-              </div>
+            {FEATURES.map((f, i) => (
+              <Reveal key={f.title} delayMs={i * 80}>
+                <div className="h-full border-t-4 border-pit-500 bg-white p-6 shadow-panel transition-all duration-300 ease-premium hover:-translate-y-1 hover:shadow-lg">
+                  <h3 className="font-display text-lg font-semibold uppercase text-asphalt-800">
+                    {f.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-steel-500">{f.body}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -108,7 +113,7 @@ export default async function HomePage() {
       {featuredServices.length > 0 && (
         <section className="bg-cream-300 py-20">
           <div className="container-page">
-            <div className="flex flex-wrap items-end justify-between gap-4">
+            <Reveal className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <span className="eyebrow">Popular Services</span>
                 <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
@@ -118,10 +123,12 @@ export default async function HomePage() {
               <Link href="/services" className="btn-dark">
                 View All Services
               </Link>
-            </div>
+            </Reveal>
             <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredServices.map((service) => (
-                <ServiceCard key={service.id} service={service} />
+              {featuredServices.map((service, i) => (
+                <Reveal key={service.id} delayMs={i * 80}>
+                  <ServiceCard service={service} />
+                </Reveal>
               ))}
             </div>
           </div>
@@ -130,7 +137,7 @@ export default async function HomePage() {
 
       {/* CTA banner */}
       <section className="bg-asphalt-800">
-        <div className="container-page flex flex-col items-center justify-between gap-6 py-12 text-center md:flex-row md:text-left">
+        <Reveal className="container-page flex flex-col items-center justify-between gap-6 py-12 text-center md:flex-row md:text-left">
           <div>
             <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl">
               Ready to book your vehicle in?
@@ -142,7 +149,7 @@ export default async function HomePage() {
           <Link href="/book" className="btn-primary shrink-0">
             Book Appointment
           </Link>
-        </div>
+        </Reveal>
       </section>
     </>
   );

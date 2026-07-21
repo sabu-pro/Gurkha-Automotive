@@ -4,8 +4,8 @@ import type { Service } from "@/lib/types";
 
 export default function ServiceCard({ service }: { service: Service }) {
   return (
-    <div className="card-panel group relative flex flex-col overflow-hidden p-6 transition-transform hover:-translate-y-1 hover:shadow-lg">
-      <div className="absolute inset-x-0 top-0 h-1 bg-pit-500 opacity-0 transition-opacity group-hover:opacity-100" />
+    <div className="card-panel group relative flex h-full flex-col overflow-hidden p-6 hover:-translate-y-1 hover:shadow-lg">
+      <div className="absolute inset-x-0 top-0 h-1 origin-left scale-x-0 bg-pit-500 transition-transform duration-300 ease-premium group-hover:scale-x-100" />
       <h3 className="font-display text-xl font-semibold uppercase tracking-wide text-asphalt-800">
         {service.name}
       </h3>

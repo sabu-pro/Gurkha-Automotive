@@ -60,6 +60,23 @@ const config: Config = {
       boxShadow: {
         panel: "0 1px 0 0 rgba(255,255,255,0.6) inset, 0 20px 40px -24px rgba(27,31,35,0.25)",
       },
+      keyframes: {
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translateY(18px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+      },
+      animation: {
+        "fade-up": "fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "fade-in": "fade-in 0.8s ease-out both",
+      },
+      transitionTimingFunction: {
+        premium: "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
     },
   },
   plugins: [],
