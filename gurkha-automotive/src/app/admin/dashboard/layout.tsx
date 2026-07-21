@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/constants";
 import SignOutButton from "@/components/admin/SignOutButton";
@@ -8,11 +9,16 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
       <header className="border-b border-asphalt-600 bg-asphalt-800">
         <div className="container-page flex h-16 items-center justify-between">
           <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-            <span className="grid h-9 w-9 place-items-center rounded-sm bg-amber-500 font-display text-lg font-bold text-asphalt-900">
-              GA
-            </span>
+            <Image
+              src="/logo.png"
+              alt={BUSINESS.name}
+              width={725}
+              height={229}
+              priority
+              className="h-9 w-auto"
+            />
             <span className="font-display text-base font-semibold uppercase tracking-wide text-cream-100">
-              {BUSINESS.name} <span className="text-cream-100/50">· Admin</span>
+              <span className="text-cream-100/50">Admin</span>
             </span>
           </Link>
           <SignOutButton />
