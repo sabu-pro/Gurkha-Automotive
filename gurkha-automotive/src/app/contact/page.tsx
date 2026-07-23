@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { BUSINESS, OPENING_HOURS } from "@/lib/constants";
 import ContactForm from "@/components/ContactForm";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -24,6 +26,16 @@ export default function ContactPage() {
       <section className="bg-cream-200 py-16">
         <div className="container-page grid gap-10 lg:grid-cols-2">
           <div className="space-y-8">
+            <Reveal className="group relative aspect-[4/3] w-full overflow-hidden rounded-md shadow-panel sm:aspect-[16/9]">
+              <Image
+                src="/gurkha-workshop-exterior.jpg"
+                alt="Gurkha Automotive workshop frontage with signage on Whitehill Ave, Sunshine North"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover object-center transition-transform duration-300 ease-premium group-hover:scale-105"
+              />
+            </Reveal>
+
             <div className="card-panel p-6">
               <h2 className="font-display text-lg font-semibold uppercase text-asphalt-800">
                 Workshop Details
