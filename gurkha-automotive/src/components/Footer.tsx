@@ -82,7 +82,12 @@ export default function Footer() {
       <div className="border-t border-asphalt-600 py-6">
         <div className="container-page flex flex-col items-center justify-between gap-2 text-xs text-cream-100/40 sm:flex-row">
           <p>© {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</p>
-          <p>{BUSINESS.addressLine1}, {BUSINESS.addressLine2}</p>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-cream-100/70">
+              Privacy
+            </Link>
+            <p>{BUSINESS.addressLine1}, {BUSINESS.addressLine2}</p>
+          </div>
         </div>
       </div>
     </footer>

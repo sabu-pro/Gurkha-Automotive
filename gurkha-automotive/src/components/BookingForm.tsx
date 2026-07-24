@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Calendar from "@/components/Calendar";
 import { formatDateDisplay, formatTimeDisplay } from "@/lib/utils";
 import { suggestEmailCorrection } from "@/lib/email-suggest";
@@ -290,6 +291,14 @@ export default function BookingForm({ services }: { services: Service[] }) {
       {submitError && (
         <p className="rounded-sm bg-rust/10 px-3 py-2 text-sm text-rust-600">{submitError}</p>
       )}
+
+      <p className="text-xs text-steel-400">
+        We only use your details to manage your booking and contact you about your vehicle. We
+        don&apos;t share your information with third parties.{" "}
+        <Link href="/privacy" className="underline hover:text-pit-600">
+          Privacy Policy
+        </Link>
+      </p>
 
       <button
         type="submit"

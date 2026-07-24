@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { suggestEmailCorrection } from "@/lib/email-suggest";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -112,6 +113,14 @@ export default function ContactForm() {
       {status === "error" && (
         <p className="rounded-sm bg-rust/10 px-3 py-2 text-sm text-rust-600">{errorMessage}</p>
       )}
+
+      <p className="text-xs text-steel-400">
+        We only use your details to manage your booking and contact you about your vehicle. We
+        don&apos;t share your information with third parties.{" "}
+        <Link href="/privacy" className="underline hover:text-pit-600">
+          Privacy Policy
+        </Link>
+      </p>
 
       <button type="submit" className="btn-dark w-full" disabled={status === "submitting"}>
         {status === "submitting" ? "Sending…" : "Send Message"}
