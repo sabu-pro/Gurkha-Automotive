@@ -24,6 +24,22 @@ const FEATURES = [
   },
 ];
 
+const TESTIMONIALS = [
+  {
+    quote:
+      "I had a fabulous experience with the Gurkha Automotive team ! I really appreciated their warm welcome, polite communication, and professional work ethics. I took my car in for tyre maintenance and was incredibly impressed by their honesty and professionalism. They explained everything clearly without any pushy upsell tactics. This is officially my go-to automotive repair shop in Melbourne",
+    name: "Dhan Ghale",
+  },
+  {
+    quote: "I had great experience at this enterprise. He had expert knowledge and fixed my van quick. The price is low and honest.",
+    name: "Rajat",
+  },
+  {
+    quote: "Taking great care with my vehicle. Very knowledgeable, honest and friendly.",
+    name: "M W",
+  },
+];
+
 export default async function HomePage() {
   const services = await getActiveServices();
   const featuredServices = services.slice(0, 3);
@@ -163,6 +179,51 @@ export default async function HomePage() {
             <p className="mt-1 text-base text-steel-500">{BUSINESS.addressLine2}</p>
           </div>
         </Reveal>
+      </section>
+
+      {/* Testimonials */}
+      <section className="bg-cream-200 py-20">
+        <div className="container-page">
+          <Reveal>
+            <span className="eyebrow">What Our Customers Say</span>
+            <h2 className="mt-3 max-w-xl font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
+              Trusted by drivers across Melbourne&apos;s west
+            </h2>
+          </Reveal>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {TESTIMONIALS.map((t, i) => (
+              <Reveal key={t.name} delayMs={i * 80}>
+                <div className="flex h-full flex-col gap-4 border-t-4 border-pit-500 bg-white p-6 shadow-panel transition-all duration-300 ease-premium hover:-translate-y-1 hover:shadow-lg">
+                  <div className="flex gap-0.5 text-amber-500" aria-hidden="true">
+                    {Array.from({ length: 5 }).map((_, starIndex) => (
+                      <svg key={starIndex} viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                        <path d="M10 1.5l2.6 5.4 5.9.8-4.3 4.2 1 5.9L10 15l-5.2 2.8 1-5.9-4.3-4.2 5.9-.8L10 1.5z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="flex-1 text-sm leading-relaxed text-steel-500">&ldquo;{t.quote}&rdquo;</p>
+                  <div>
+                    <p className="font-display text-sm font-semibold uppercase tracking-wide text-asphalt-800">
+                      {t.name}
+                    </p>
+                    <p className="text-xs text-steel-400">Google review</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+          <p className="mt-10 text-center text-sm font-semibold text-steel-500">
+            <a
+              href={BUSINESS.googleBusinessUrl}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-center gap-1.5 hover:text-pit-600"
+            >
+              See our reviews on Google
+              <span className="text-amber-500" aria-hidden="true">★</span>
+            </a>
+          </p>
+        </div>
       </section>
 
       {/* CTA banner */}
