@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getActiveServices } from "@/lib/data";
 import BookingForm from "@/components/BookingForm";
+import BookingFormSkeleton from "@/components/BookingFormSkeleton";
 import { BUSINESS } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default async function BookPage() {
 
       <section className="bg-cream-200 py-16">
         <div className="container-page max-w-4xl">
-          <Suspense fallback={<div className="card-panel p-8 text-sm text-steel-500">Loading booking form…</div>}>
+          <Suspense fallback={<BookingFormSkeleton />}>
             <BookingForm services={services} />
           </Suspense>
         </div>
