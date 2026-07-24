@@ -26,6 +26,21 @@ export const OPENING_HOURS: DayHours[] = [
   { day: "Sunday", open: null, close: null },
 ];
 
+// Formats a 24h "HH:MM" time as "9 AM" / "5:30 PM".
+function formatHour12(time: string): string {
+  const [h, m] = time.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 === 0 ? 12 : h % 12;
+  return `${hour}${m ? ":" + String(m).padStart(2, "0") : ""} ${period}`;
+}
+
+// Formats a day's hours as "9 AM – 5 PM", or "Closed".
+export function formatOpeningHoursRange(hours: DayHours): string {
+  return hours.open && hours.close
+    ? `${formatHour12(hours.open)} – ${formatHour12(hours.close)}`
+    : "Closed";
+}
+
 // 0 = Sunday ... 6 = Saturday, matching JS Date#getDay()
 export const WEEKDAY_HOURS: Record<number, { open: string; close: string } | null> = {
   0: null,

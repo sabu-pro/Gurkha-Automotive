@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { BUSINESS, OPENING_HOURS } from "@/lib/constants";
+import { BUSINESS, OPENING_HOURS, formatOpeningHoursRange } from "@/lib/constants";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 
@@ -64,9 +64,7 @@ export default function ContactPage() {
                 {OPENING_HOURS.map((h) => (
                   <li key={h.day} className="flex justify-between border-b border-cream-300 pb-1.5 last:border-none">
                     <span className="font-semibold text-asphalt-800">{h.day}</span>
-                    <span className="font-mono">
-                      {h.open && h.close ? `${h.open} – ${h.close}` : "Closed"}
-                    </span>
+                    <span className="font-mono">{formatOpeningHoursRange(h)}</span>
                   </li>
                 ))}
               </ul>

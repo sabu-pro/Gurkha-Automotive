@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BUSINESS, OPENING_HOURS } from "@/lib/constants";
+import { BUSINESS, OPENING_HOURS, formatOpeningHoursRange } from "@/lib/constants";
 import Reveal from "@/components/Reveal";
 
 export default function Footer() {
@@ -48,9 +48,7 @@ export default function Footer() {
             {OPENING_HOURS.map((h) => (
               <li key={h.day} className="flex justify-between gap-6">
                 <span>{h.day}</span>
-                <span className="font-mono">
-                  {h.open && h.close ? `${to12h(h.open)} – ${to12h(h.close)}` : "Closed"}
-                </span>
+                <span className="font-mono">{formatOpeningHoursRange(h)}</span>
               </li>
             ))}
           </ul>
@@ -65,11 +63,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-}
-
-function to12h(time: string): string {
-  const [h, m] = time.split(":").map(Number);
-  const period = h >= 12 ? "PM" : "AM";
-  const hour = h % 12 === 0 ? 12 : h % 12;
-  return `${hour}${m ? ":" + String(m).padStart(2, "0") : ""} ${period}`;
 }
