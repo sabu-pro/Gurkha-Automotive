@@ -2,7 +2,12 @@ export const BUSINESS = {
   name: "Gurkha Automotive",
   addressLine1: "23 Whitehill Ave",
   addressLine2: "Sunshine North VIC 3020",
+  addressLocality: "Sunshine North",
+  addressRegion: "VIC",
+  postalCode: "3020",
   addressCountry: "Australia",
+  // ISO 3166-1 alpha-2, as recommended by Google for LocalBusiness structured data.
+  addressCountryCode: "AU",
   fullAddress: "23 Whitehill Ave, Sunshine North VIC 3020, Australia",
   phone: "0422 960 735",
   phoneHref: "tel:+61422960735",
@@ -54,3 +59,31 @@ export const WEEKDAY_HOURS: Record<number, { open: string; close: string } | nul
 };
 
 export const BOOKING_SLOT_MINUTES = 45;
+
+// schema.org LocalBusiness (AutoRepair) structured data, built from the same
+// BUSINESS / OPENING_HOURS values rendered on the page so it can't drift.
+export function getLocalBusinessJsonLd(siteUrl: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "AutoRepair",
+    name: BUSINESS.name,
+    url: siteUrl,
+    telephone: BUSINESS.phoneHref.replace("tel:", ""),
+    email: BUSINESS.email,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: BUSINESS.addressLine1,
+      addressLocality: BUSINESS.addressLocality,
+      addressRegion: BUSINESS.addressRegion,
+      postalCode: BUSINESS.postalCode,
+      addressCountry: BUSINESS.addressCountryCode,
+    },
+    openingHoursSpecification: OPENING_HOURS.filter((h) => h.open && h.close).map((h) => ({
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: h.day,
+      opens: h.open,
+      closes: h.close,
+    })),
+    sameAs: [BUSINESS.googleBusinessUrl],
+  };
+}

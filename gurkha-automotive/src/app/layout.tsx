@@ -3,7 +3,7 @@ import { Inter, Oswald, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { BUSINESS } from "@/lib/constants";
+import { BUSINESS, getLocalBusinessJsonLd } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/site-url";
 
 const inter = Inter({
@@ -39,9 +39,15 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const jsonLd = getLocalBusinessJsonLd(getSiteUrl());
+
   return (
     <html lang="en" className={`${inter.variable} ${oswald.variable} ${plexMono.variable}`}>
       <body className="flex min-h-screen flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+        />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
