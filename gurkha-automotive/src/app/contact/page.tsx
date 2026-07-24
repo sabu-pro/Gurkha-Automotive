@@ -53,6 +53,14 @@ export default function ContactPage() {
                     </a>
                   </dd>
                 </div>
+                <div>
+                  <dt className="font-bold text-asphalt-800">Email</dt>
+                  <dd>
+                    <a href={BUSINESS.emailHref} className="hover:text-pit-600">
+                      {BUSINESS.email}
+                    </a>
+                  </dd>
+                </div>
               </dl>
             </div>
 

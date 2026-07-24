@@ -31,6 +31,11 @@ export default function Footer() {
                 {BUSINESS.phone}
               </a>
             </li>
+            <li>
+              <a href={BUSINESS.emailHref} className="hover:text-pit-400">
+                {BUSINESS.email}
+              </a>
+            </li>
           </ul>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Link href="/book" className="btn-primary">

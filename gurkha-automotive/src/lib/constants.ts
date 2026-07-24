@@ -6,8 +6,8 @@ export const BUSINESS = {
   fullAddress: "23 Whitehill Ave, Sunshine North VIC 3020, Australia",
   phone: "0422 960 735",
   phoneHref: "tel:+61422960735",
-  // Placeholder — replace with the real business inbox once available.
-  email: "info@gurkhaautomotive.com.au",
+  email: "gurkhaautomotive@gmail.com",
+  emailHref: "mailto:gurkhaautomotive@gmail.com",
 } as const;
 
 export type DayHours = {
