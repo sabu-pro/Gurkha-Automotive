@@ -56,7 +56,18 @@ export default function ContactPage() {
                 <div>
                   <dt className="font-bold text-asphalt-800">Email</dt>
                   <dd>
-                    <a href={BUSINESS.emailHref} className="hover:text-pit-600">
+                    <a href={BUSINESS.emailHref} className="inline-flex items-center gap-1.5 hover:text-pit-600">
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.75}
+                        className="h-4 w-4 shrink-0"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 6.75A1.75 1.75 0 0 1 4.75 5h14.5A1.75 1.75 0 0 1 21 6.75v10.5A1.75 1.75 0 0 1 19.25 19H4.75A1.75 1.75 0 0 1 3 17.25V6.75Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m3.5 7 8.5 6 8.5-6" />
+                      </svg>
                       {BUSINESS.email}
                     </a>
                   </dd>
