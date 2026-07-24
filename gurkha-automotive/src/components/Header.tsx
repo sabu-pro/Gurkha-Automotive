@@ -51,8 +51,8 @@ export default function Header() {
           <Image
             src="/logo.png"
             alt={BUSINESS.name}
-            width={725}
-            height={229}
+            width={228}
+            height={72}
             priority
             className={cn(
               "w-auto transition-all duration-300 ease-premium group-hover:scale-105",

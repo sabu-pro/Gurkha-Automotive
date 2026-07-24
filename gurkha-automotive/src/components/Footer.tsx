@@ -11,8 +11,8 @@ export default function Footer() {
           <Image
             src="/logo.png"
             alt={BUSINESS.name}
-            width={725}
-            height={229}
+            width={127}
+            height={40}
             className="h-10 w-auto transition-transform duration-300 ease-premium hover:scale-105"
           />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-100/60">

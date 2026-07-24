@@ -12,8 +12,8 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
             <Image
               src="/logo.png"
               alt={BUSINESS.name}
-              width={725}
-              height={229}
+              width={114}
+              height={36}
               priority
               className="h-9 w-auto"
             />
