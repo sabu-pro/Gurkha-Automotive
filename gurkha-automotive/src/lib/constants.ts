@@ -8,6 +8,7 @@ export const BUSINESS = {
   phoneHref: "tel:+61422960735",
   email: "gurkhaautomotive@gmail.com",
   emailHref: "mailto:gurkhaautomotive@gmail.com",
+  googleBusinessUrl: "https://share.google/HgWBBinjZFqhQzige",
 } as const;
 
 export type DayHours = {

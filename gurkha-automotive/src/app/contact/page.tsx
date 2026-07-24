@@ -100,6 +100,14 @@ export default function ContactPage() {
                 className="block"
               />
             </div>
+            <a
+              href={BUSINESS.googleBusinessUrl}
+              target="_blank"
+              rel="noopener"
+              className="inline-block text-sm font-semibold text-steel-500 hover:text-pit-600"
+            >
+              See us on Google Maps
+            </a>
           </div>
 
           <div>

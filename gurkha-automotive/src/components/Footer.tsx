@@ -55,6 +55,14 @@ export default function Footer() {
             <Link href="/admin/login" className="text-xs font-semibold uppercase tracking-wide text-cream-100/40 hover:text-cream-100/70 self-center">
               Admin
             </Link>
+            <a
+              href={BUSINESS.googleBusinessUrl}
+              target="_blank"
+              rel="noopener"
+              className="text-xs font-semibold uppercase tracking-wide text-cream-100/40 hover:text-cream-100/70 self-center"
+            >
+              Find us on Google
+            </a>
           </div>
         </div>
 
