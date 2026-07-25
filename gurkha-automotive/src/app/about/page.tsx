@@ -37,11 +37,7 @@ export default function AboutPage() {
                 language, before any work begins — and getting the owner&apos;s sign-off on
                 anything beyond the original job.
               </p>
-              <p className="rounded-sm border border-dashed border-steel-400/50 bg-white p-4 text-steel-500">
-                <strong className="text-asphalt-800">Content placeholder:</strong> add the
-                workshop&apos;s history, the team&apos;s background and qualifications, and any
-                accreditations here once supplied by the business.
-              </p>
+              
             </div>
 
             <h2 className="mt-10 font-display text-2xl font-semibold uppercase text-asphalt-800">
