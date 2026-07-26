@@ -37,8 +37,8 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b bg-white/95 backdrop-blur transition-all duration-300 ease-premium",
-        scrolled ? "border-cream-300 shadow-sm" : "border-transparent"
+        "sticky top-0 z-50 border-b bg-asphalt-900/95 backdrop-blur transition-all duration-300 ease-premium",
+        scrolled ? "border-asphalt-600 shadow-md shadow-black/20" : "border-transparent"
       )}
     >
       <div
@@ -67,9 +67,9 @@ export default function Header() {
               key={link.href}
               href={link.href}
               className={cn(
-                "relative pb-1 text-sm font-semibold uppercase tracking-wide text-steel-500 transition-colors duration-300 hover:text-pit-600",
-                "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-pit-500 after:transition-transform after:duration-300 after:ease-premium hover:after:scale-x-100",
-                pathname === link.href && "text-asphalt-800 after:scale-x-100"
+                "relative pb-1 text-sm font-semibold uppercase tracking-wide text-cream-100/75 transition-colors duration-300 hover:text-pit-400",
+                "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-pit-400 after:transition-transform after:duration-300 after:ease-premium hover:after:scale-x-100",
+                pathname === link.href && "text-cream-100 after:scale-x-100"
               )}
             >
               {link.label}
@@ -80,7 +80,7 @@ export default function Header() {
         <div className="hidden items-center gap-3 md:flex">
           <a
             href={BUSINESS.phoneHref}
-            className="group inline-flex items-center gap-2 rounded-sm border border-asphalt-800/15 px-5 py-3 text-sm font-bold uppercase tracking-wide text-asphalt-800 transition-all duration-200 ease-premium hover:-translate-y-0.5 hover:border-pit-500 hover:text-pit-600 active:translate-y-0"
+            className="group inline-flex items-center gap-2 rounded-sm border border-cream-100/25 px-5 py-3 text-sm font-bold uppercase tracking-wide text-cream-100 transition-all duration-200 ease-premium hover:-translate-y-0.5 hover:border-pit-400 hover:text-pit-400 active:translate-y-0"
           >
             <svg
               width="16"
@@ -101,7 +101,7 @@ export default function Header() {
 
         <button
           type="button"
-          className="grid h-10 w-10 place-items-center text-asphalt-800 transition-transform duration-300 ease-premium md:hidden"
+          className="grid h-10 w-10 place-items-center text-cream-100 transition-transform duration-300 ease-premium md:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -119,7 +119,7 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="animate-fade-up border-t border-cream-300 bg-white md:hidden">
+        <div className="animate-fade-up border-t border-asphalt-600 bg-asphalt-900 md:hidden">
           <nav className="container-page flex flex-col gap-1 py-4">
             {NAV_LINKS.map((link) => (
               <Link
@@ -127,8 +127,8 @@ export default function Header() {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "rounded-sm px-2 py-2.5 text-sm font-semibold uppercase tracking-wide",
-                  pathname === link.href ? "text-pit-600" : "text-steel-600"
+                  "rounded-sm px-2 py-2.5 text-sm font-semibold uppercase tracking-wide transition-colors duration-200",
+                  pathname === link.href ? "text-pit-400" : "text-cream-100/75 hover:text-pit-400"
                 )}
               >
                 {link.label}
@@ -137,7 +137,7 @@ export default function Header() {
             <a
               href={BUSINESS.phoneHref}
               onClick={() => setOpen(false)}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-sm border border-asphalt-800/15 px-2 py-2.5 text-sm font-bold uppercase tracking-wide text-asphalt-800"
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-sm border border-cream-100/25 px-2 py-2.5 text-sm font-bold uppercase tracking-wide text-cream-100 transition-colors duration-200 hover:border-pit-400 hover:text-pit-400"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1.1l-2.3 2.1z" />

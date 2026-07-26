@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/constants";
 import { getActiveServices } from "@/lib/data";
 import ServiceCard from "@/components/ServiceCard";
 import Reveal from "@/components/Reveal";
+import FadeImage from "@/components/FadeImage";
 
 const FEATURES = [
   {
@@ -48,13 +48,13 @@ export default async function HomePage() {
     <>
       {/* Hero */}
       <section className="relative flex min-h-[60vh] items-center overflow-hidden bg-asphalt-800 text-cream-100 md:min-h-[70vh]">
-        <Image
+        <FadeImage
           src="/gurkha-mechanic-hero-16x9.jpg"
           alt="Gurkha Automotive mechanic servicing a vehicle in Sunshine North"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-cover object-center transition-opacity duration-700 ease-premium"
         />
         <div
           className="absolute inset-0 bg-gradient-to-b from-black/55 to-black/35"
@@ -65,10 +65,10 @@ export default async function HomePage() {
             <span className="eyebrow-on-dark animate-fade-up inline-block rounded-sm bg-black/35 px-2 py-1 backdrop-blur-sm">
               Sunshine North, VIC
             </span>
-            <h1 className="animate-fade-up mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight [animation-delay:100ms] sm:text-5xl">
-              Honest mechanical
+            <h1 className="animate-fade-up mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tighter [animation-delay:100ms] sm:text-5xl">
+              No upsell. No surprises.
               <br />
-              work, done right
+              Just honest work
               <span className="text-rust-500">.</span>
             </h1>
             <p className="animate-fade-up mt-6 max-w-md text-base leading-relaxed text-cream-100/80 [animation-delay:200ms]">
@@ -88,7 +88,7 @@ export default async function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="bg-white py-20">
+      <section className="bg-white py-16">
         <div className="container-page">
           <Reveal>
             <span className="eyebrow">Why Gurkha Automotive</span>
@@ -98,12 +98,12 @@ export default async function HomePage() {
           </Reveal>
           <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
             <Reveal className="group relative aspect-[4/3] w-full overflow-hidden rounded-md shadow-panel">
-              <Image
+              <FadeImage
                 src="/gurkha-4wd-workshop.jpg"
                 alt="A 4WD parked outside the Gurkha Automotive workshop in Sunshine North"
                 fill
                 sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover object-right transition-transform duration-300 ease-premium group-hover:scale-105"
+                className="object-cover object-right transition-all duration-500 ease-premium group-hover:scale-105"
               />
             </Reveal>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -124,17 +124,17 @@ export default async function HomePage() {
 
       {/* Services preview */}
       {featuredServices.length > 0 && (
-        <section className="bg-cream-300 py-20">
+        <section className="bg-cream-300 py-16">
           <div className="container-page">
             <Reveal className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-5">
                 <div className="group relative hidden h-24 w-20 shrink-0 overflow-hidden rounded-md shadow-panel sm:block sm:h-28 sm:w-24">
-                  <Image
+                  <FadeImage
                     src="/gurkha-engine-detail.jpg"
                     alt="Close-up of engine internals during a service at Gurkha Automotive"
                     fill
                     sizes="96px"
-                    className="object-cover transition-transform duration-300 ease-premium group-hover:scale-105"
+                    className="object-cover transition-all duration-500 ease-premium group-hover:scale-105"
                   />
                 </div>
                 <div>
@@ -160,15 +160,15 @@ export default async function HomePage() {
       )}
 
       {/* Visit our workshop */}
-      <section className="bg-white py-16">
+      <section className="bg-white py-14">
         <Reveal className="container-page flex flex-col gap-8 sm:flex-row sm:items-center">
           <div className="group relative h-48 w-full shrink-0 overflow-hidden rounded-md shadow-panel sm:h-56 sm:w-56">
-            <Image
+            <FadeImage
               src="/gurkha-workshop-exterior.jpg"
               alt="Gurkha Automotive workshop frontage with signage on Whitehill Ave, Sunshine North"
               fill
               sizes="(min-width: 640px) 224px, 100vw"
-              className="object-cover object-center transition-transform duration-300 ease-premium group-hover:scale-105"
+              className="object-cover object-center transition-all duration-500 ease-premium group-hover:scale-105"
             />
           </div>
           <div>
@@ -182,7 +182,7 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-cream-200 py-20">
+      <section className="bg-cream-200 py-16">
         <div className="container-page">
           <Reveal>
             <span className="eyebrow">What Our Customers Say</span>
