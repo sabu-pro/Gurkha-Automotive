@@ -26,14 +26,29 @@ const plexMono = IBM_Plex_Mono({
   weight: ["500", "600"],
 });
 
+const defaultTitle = `${BUSINESS.name} | Mechanic in Sunshine North, VIC`;
+const defaultDescription = `${BUSINESS.name} is an independent mechanic in Sunshine North, with car service, logbook service and roadworthy inspections for Melbourne's western suburbs.`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${BUSINESS.name} | Mechanic in Sunshine North, VIC`,
+    default: defaultTitle,
     template: `%s | ${BUSINESS.name}`,
   },
-  description:
-    `${BUSINESS.name} is an independent mechanic in Sunshine North, with car service, logbook service and roadworthy inspections for Melbourne's western suburbs.`,
+  description: defaultDescription,
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    url: getSiteUrl(),
+    siteName: BUSINESS.name,
+    title: defaultTitle,
+    description: defaultDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: defaultTitle,
+    description: defaultDescription,
+  },
 };
 
 export default function RootLayout({
