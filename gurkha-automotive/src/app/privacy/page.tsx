@@ -3,7 +3,8 @@ import { BUSINESS } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: `How ${BUSINESS.name} collects, uses and protects your information.`,
+  description:
+    `Read how ${BUSINESS.name} collects, stores and protects the personal information you provide when booking a service at our Sunshine North workshop.`,
 };
 
 export default function PrivacyPage() {

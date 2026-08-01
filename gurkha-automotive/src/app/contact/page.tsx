@@ -6,7 +6,8 @@ import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: `Get in touch with ${BUSINESS.name} in Sunshine North, VIC.`,
+  description:
+    `Contact ${BUSINESS.name}, your local mechanic in Sunshine North. Call, email or visit our workshop to discuss car service, repairs or roadworthy inspections.`,
 };
 
 export default function ContactPage() {

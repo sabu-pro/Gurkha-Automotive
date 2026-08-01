@@ -4,7 +4,8 @@ import { BUSINESS } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `About ${BUSINESS.name}, a local automotive workshop in Sunshine North, VIC.`,
+  description:
+    `${BUSINESS.name} is an independent mechanic in Sunshine North, serving Melbourne's western suburbs with honest advice and no surprise charges on every job.`,
 };
 
 export default function AboutPage() {

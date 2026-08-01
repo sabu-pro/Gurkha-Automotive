@@ -7,7 +7,8 @@ import { BUSINESS } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Book Appointment",
-  description: `Book your vehicle service or repair online at ${BUSINESS.name}.`,
+  description:
+    `Book your car service, logbook service or roadworthy inspection online with ${BUSINESS.name}, a trusted independent mechanic in Sunshine North, Melbourne.`,
 };
 
 export default async function BookPage() {

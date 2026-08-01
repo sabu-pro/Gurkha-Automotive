@@ -224,7 +224,7 @@ git push -u origin main
    - `RESEND_FROM_EMAIL`
    - `GARAGE_NOTIFICATION_EMAIL`
    - `NEXT_PUBLIC_SITE_URL` → set to your production URL, e.g.
-     `https://gurkha-automotive.vercel.app` or your custom domain
+     `https://www.gurkhaautomotive.com.au` or your custom domain
 4. Click **Deploy**.
 5. In Supabase → **Authentication → URL Configuration**, add your
    production URL to the allowed Site URL / Redirect URLs list.

@@ -29,11 +29,11 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${BUSINESS.name} — Trusted Mechanics in Sunshine North, VIC`,
-    template: `%s — ${BUSINESS.name}`,
+    default: `${BUSINESS.name} | Mechanic in Sunshine North, VIC`,
+    template: `%s | ${BUSINESS.name}`,
   },
   description:
-    `${BUSINESS.name} is a local automotive workshop in Sunshine North, VIC, offering servicing, inspections, brakes, tyres and diagnostics. Book your appointment online.`,
+    `${BUSINESS.name} is an independent mechanic in Sunshine North, with car service, logbook service and roadworthy inspections for Melbourne's western suburbs.`,
 };
 
 export default function RootLayout({

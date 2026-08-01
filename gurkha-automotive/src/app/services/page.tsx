@@ -5,7 +5,8 @@ import ServiceCard from "@/components/ServiceCard";
 
 export const metadata: Metadata = {
   title: "Services",
-  description: "Vehicle servicing, inspections, brakes, tyres, batteries and diagnostics at Gurkha Automotive.",
+  description:
+    "Mechanic services in Sunshine North: logbook service, roadworthy inspections, brakes, tyres, batteries and diagnostics for Melbourne's western suburbs.",
 };
 
 export const revalidate = 60;
