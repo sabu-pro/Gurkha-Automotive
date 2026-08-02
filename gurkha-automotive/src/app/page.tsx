@@ -4,6 +4,7 @@ import { getActiveServices } from "@/lib/data";
 import ServiceCard from "@/components/ServiceCard";
 import Reveal from "@/components/Reveal";
 import FadeImage from "@/components/FadeImage";
+import HeroVideo from "@/components/HeroVideo";
 
 const FEATURES = [
   {
@@ -48,34 +49,31 @@ export default async function HomePage() {
     <>
       {/* Hero */}
       <section className="relative flex min-h-[60vh] items-center overflow-hidden bg-asphalt-800 text-cream-100 md:min-h-[70vh]">
-        <FadeImage
-          src="/gurkha-mechanic-hero-16x9.jpg"
-          alt="Gurkha Automotive mechanic servicing a vehicle in Sunshine North"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center transition-opacity duration-700 ease-premium"
+        <HeroVideo
+          videoSrc="/hero.mp4"
+          poster="/hero-poster.jpg"
+          posterAlt="Black SUV with headlights on inside the Gurkha Automotive workshop"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-b from-black/55 to-black/35"
+          className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_20%_60%,rgba(0,0,0,0.62)_0%,rgba(0,0,0,0.28)_45%,rgba(0,0,0,0)_75%)]"
           aria-hidden="true"
         />
         <div className="container-page relative py-20">
           <div className="max-w-xl [text-shadow:0_2px_10px_rgba(0,0,0,0.55)]">
-            <span className="eyebrow-on-dark animate-fade-up inline-block rounded-sm bg-black/35 px-2 py-1 backdrop-blur-sm">
+            <span className="eyebrow-on-dark inline-block rounded-sm bg-black/35 px-2 py-1 backdrop-blur-sm">
               Sunshine North, VIC
             </span>
-            <h1 className="animate-fade-up mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tighter [animation-delay:100ms] sm:text-5xl">
+            <h1 className="mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tighter sm:text-5xl">
               No upsell. No surprises.
               <br />
               Just honest work
               <span className="text-rust-500">.</span>
             </h1>
-            <p className="animate-fade-up mt-6 max-w-md text-base leading-relaxed text-cream-100/80 [animation-delay:200ms]">
+            <p className="mt-6 max-w-md text-base leading-relaxed text-cream-100/80">
               {BUSINESS.name} services, inspects and repairs vehicles for the local
               community. Book your appointment online in a couple of minutes.
             </p>
-            <div className="animate-fade-up mt-8 flex flex-wrap gap-4 [animation-delay:300ms]">
+            <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/book" className="btn-primary">
                 Book an Appointment
               </Link>
@@ -99,11 +97,11 @@ export default async function HomePage() {
           <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
             <Reveal className="group relative aspect-[4/3] w-full overflow-hidden rounded-md shadow-panel">
               <FadeImage
-                src="/gurkha-4wd-workshop.jpg"
-                alt="A 4WD parked outside the Gurkha Automotive workshop in Sunshine North"
+                src="/gurkha-mechanic-at-work.jpg"
+                alt="A Gurkha Automotive mechanic working under the hood of a vehicle in the Sunshine North workshop"
                 fill
                 sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover object-right transition-all duration-500 ease-premium group-hover:scale-105"
+                className="object-cover object-center transition-all duration-500 ease-premium group-hover:scale-105"
               />
             </Reveal>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
