@@ -212,12 +212,12 @@ export default async function HomePage() {
           </div>
           <p className="mt-10 text-center text-sm font-semibold text-steel-500">
             <a
-              href={BUSINESS.googleBusinessUrl}
+              href="https://g.page/r/CXp80y2sH_0VEBE/review"
               target="_blank"
               rel="noopener"
               className="inline-flex items-center gap-1.5 hover:text-pit-600"
             >
-              See our reviews on Google
+              Leave us a review on Google
               <span className="text-amber-500" aria-hidden="true">★</span>
             </a>
           </p>
