@@ -3,6 +3,7 @@ import { Inter, Oswald, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SiteChrome from "@/components/SiteChrome";
 import { BUSINESS, getLocalBusinessJsonLd } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -63,9 +64,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
-        <Header />
+        <SiteChrome>
+          <Header />
+        </SiteChrome>
         <main className="flex-1">{children}</main>
-        <Footer />
+        <SiteChrome>
+          <Footer />
+        </SiteChrome>
       </body>
     </html>
   );

@@ -109,3 +109,42 @@ export const bookingUpdateSchema = z.object({
 });
 
 export type BookingUpdateInput = z.infer<typeof bookingUpdateSchema>;
+
+// =================================================================
+// Services — admin-managed from the dashboard.
+// Price is entered in dollars in the UI but stored as integer cents,
+// so the schema accepts a dollar string and converts on the way in.
+// =================================================================
+const priceDollarsSchema = z
+  .string()
+  .trim()
+  .optional()
+  .or(z.literal(""))
+  .refine((value) => !value || /^\d+(\.\d{1,2})?$/.test(value), {
+    message: "Enter a price like 120 or 120.50, or leave blank for “Quote on inspection”.",
+  })
+  .transform((value) => (value ? Math.round(Number(value) * 100) : null));
+
+export const serviceSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Please enter a service name.")
+    .max(120, "Service name must be 120 characters or fewer."),
+  description: z
+    .string()
+    .trim()
+    .max(500, "Description must be 500 characters or fewer.")
+    .optional()
+    .or(z.literal(""))
+    .transform((value) => (value ? value : null)),
+  duration_minutes: z.coerce
+    .number()
+    .int("Duration must be a whole number of minutes.")
+    .min(5, "Duration must be at least 5 minutes.")
+    .max(600, "Duration must be 600 minutes (10 hours) or fewer."),
+  price_from_cents: priceDollarsSchema,
+  is_active: z.coerce.boolean(),
+});
+
+export type ServiceInput = z.infer<typeof serviceSchema>;
