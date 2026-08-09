@@ -24,7 +24,7 @@ values
   ('General Service', 'Full logbook-style service covering fluids, filters, brakes and safety checks.', 60, null, true),
   ('Vehicle Inspection', 'Comprehensive roadworthy / pre-purchase style inspection with a written summary.', 45, null, true),
   ('Brake Inspection & Repair', 'Brake pad, rotor and fluid inspection with repairs as needed.', 60, null, true),
-  ('Tyre Fitting & Rotation', 'Tyre fitting, balancing and rotation.', 45, null, true),
+  ('Tyre Change and Fitting', 'Tyre fitting, balancing and rotation.', 45, null, true),
   ('Battery Test & Replacement', 'Battery health check and replacement if required.', 30, null, true),
   ('Diagnostic Check', 'Computer diagnostic scan to identify warning lights and faults.', 45, null, true)
 on conflict do nothing;
