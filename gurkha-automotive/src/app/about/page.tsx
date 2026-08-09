@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/constants";
+import { getSiteContent } from "@/lib/data";
+import { splitLines, splitParagraphs } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "About",
@@ -8,14 +10,16 @@ export const metadata: Metadata = {
     `${BUSINESS.name} is an independent mechanic in Sunshine North, serving Melbourne's western suburbs with honest advice and no surprise charges on every job.`,
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const content = await getSiteContent();
+
   return (
     <>
       <section className="bg-asphalt-800 py-16 text-cream-100">
         <div className="container-page">
-          <span className="eyebrow-on-dark">About Us</span>
+          <span className="eyebrow-on-dark">{content("about.hero_eyebrow")}</span>
           <h1 className="mt-3 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">
-            {BUSINESS.name}
+            {content("about.hero_heading")}
           </h1>
         </div>
       </section>
@@ -24,35 +28,19 @@ export default function AboutPage() {
         <div className="container-page grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <h2 className="font-display text-2xl font-semibold uppercase text-asphalt-800">
-              Our Approach
+              {content("about.approach_heading")}
             </h2>
             <div className="prose-none mt-4 space-y-4 text-sm leading-relaxed text-steel-500">
-              <p>
-                {BUSINESS.name} is an independent automotive workshop based in Sunshine
-                North, servicing the local community and surrounding western suburbs of
-                Melbourne. We work on a wide range of makes and models, from routine
-                servicing through to inspections, brakes, tyres and diagnostics.
-              </p>
-              <p>
-                We believe in explaining what a vehicle actually needs, in plain
-                language, before any work begins — and getting the owner&apos;s sign-off on
-                anything beyond the original job.
-              </p>
-              
+              {splitParagraphs(content("about.approach_body")).map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
             </div>
 
             <h2 className="mt-10 font-display text-2xl font-semibold uppercase text-asphalt-800">
-              What We Work On
+              {content("about.work_on_heading")}
             </h2>
             <ul className="mt-4 grid gap-2 text-sm text-steel-500 sm:grid-cols-2">
-              {[
-                "Passenger cars",
-                "SUVs & 4WDs",
-                "Light commercial vehicles",
-                "Petrol & diesel engines",
-                "Logbook servicing",
-                "Pre-purchase inspections",
-              ].map((item) => (
+              {splitLines(content("about.work_on_items")).map((item) => (
                 <li key={item} className="flex items-center gap-2">
                   <span className="h-1.5 w-1.5 shrink-0 bg-pit-500" />
                   {item}

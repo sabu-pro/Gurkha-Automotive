@@ -49,6 +49,14 @@ export interface BlockedDate {
   reason: string | null;
 }
 
+export interface SiteContent {
+  id: string;
+  section: string;
+  field: string;
+  value: string | null;
+  updated_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -82,6 +90,11 @@ export interface Database {
         Row: BlockedDate;
         Insert: Partial<BlockedDate> & { blocked_date: string };
         Update: Partial<BlockedDate>;
+      };
+      site_content: {
+        Row: SiteContent;
+        Insert: Partial<SiteContent> & { section: string; field: string };
+        Update: Partial<SiteContent>;
       };
     };
   };

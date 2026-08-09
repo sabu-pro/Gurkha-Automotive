@@ -1,29 +1,12 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/constants";
-import { getActiveServices } from "@/lib/data";
+import { getActiveServices, getSiteContent } from "@/lib/data";
+import { splitLines } from "@/lib/utils";
 import ServiceCard from "@/components/ServiceCard";
 import Reveal from "@/components/Reveal";
 import FadeImage from "@/components/FadeImage";
 import HeroVideo from "@/components/HeroVideo";
-
-const FEATURES = [
-  {
-    title: "Straight Answers",
-    body: "We explain what your vehicle needs in plain language before any work starts — no surprise charges.",
-  },
-  {
-    title: "Local & Independent",
-    body: "A local Sunshine North workshop, not a franchise call centre. You deal directly with the people doing the work.",
-  },
-  {
-    title: "All Makes & Models",
-    body: "From daily runabouts to family SUVs, our techs work across a wide range of makes and models.",
-  },
-  {
-    title: "Book Online, Anytime",
-    body: "Pick a service, choose a time that suits you, and get instant confirmation by email.",
-  },
-];
 
 const TESTIMONIALS = [
   {
@@ -42,8 +25,13 @@ const TESTIMONIALS = [
 ];
 
 export default async function HomePage() {
-  const services = await getActiveServices();
+  const [services, content] = await Promise.all([getActiveServices(), getSiteContent()]);
   const featuredServices = services.slice(0, 3);
+  const heroLines = splitLines(content("home.hero_heading"));
+  const features = [1, 2, 3, 4].map((n) => ({
+    title: content(`home.feature_${n}_title`),
+    body: content(`home.feature_${n}_body`),
+  }));
 
   return (
     <>
@@ -61,17 +49,19 @@ export default async function HomePage() {
         <div className="container-page relative py-20">
           <div className="max-w-xl [text-shadow:0_2px_10px_rgba(0,0,0,0.55)]">
             <span className="eyebrow-on-dark inline-block rounded-sm bg-black/35 px-2 py-1 backdrop-blur-sm">
-              Sunshine North, VIC
+              {content("home.hero_eyebrow")}
             </span>
             <h1 className="mt-4 font-display text-4xl font-bold uppercase leading-[1.05] tracking-tighter sm:text-5xl">
-              No upsell. No surprises.
-              <br />
-              Just honest work
+              {heroLines.map((line, i) => (
+                <Fragment key={i}>
+                  {line}
+                  {i < heroLines.length - 1 && <br />}
+                </Fragment>
+              ))}
               <span className="text-rust-500">.</span>
             </h1>
             <p className="mt-6 max-w-md text-base leading-relaxed text-cream-100/80">
-              {BUSINESS.name} services, inspects and repairs vehicles for the local
-              community. Book your appointment online in a couple of minutes.
+              {content("home.hero_subtext")}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/book" className="btn-primary">
@@ -89,9 +79,9 @@ export default async function HomePage() {
       <section className="bg-white py-16">
         <div className="container-page">
           <Reveal>
-            <span className="eyebrow">Why Gurkha Automotive</span>
+            <span className="eyebrow">{content("home.features_eyebrow")}</span>
             <h2 className="mt-3 max-w-xl font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
-              Reliable work, fair pricing
+              {content("home.features_heading")}
             </h2>
           </Reveal>
           <div className="mt-12 grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
@@ -105,7 +95,7 @@ export default async function HomePage() {
               />
             </Reveal>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              {FEATURES.map((f, i) => (
+              {features.map((f, i) => (
                 <Reveal key={f.title} delayMs={i * 80}>
                   <div className="h-full border-t-4 border-pit-500 bg-white p-6 shadow-panel transition-all duration-300 ease-premium hover:-translate-y-1 hover:shadow-lg">
                     <h3 className="font-display text-lg font-semibold uppercase text-asphalt-800">
@@ -136,9 +126,9 @@ export default async function HomePage() {
                   />
                 </div>
                 <div>
-                  <span className="eyebrow">Popular Services</span>
+                  <span className="eyebrow">{content("home.services_eyebrow")}</span>
                   <h2 className="mt-3 font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
-                    What we can help with
+                    {content("home.services_heading")}
                   </h2>
                 </div>
               </div>
@@ -170,7 +160,7 @@ export default async function HomePage() {
             />
           </div>
           <div>
-            <span className="eyebrow">Visit Our Workshop</span>
+            <span className="eyebrow">{content("home.workshop_eyebrow")}</span>
             <p className="mt-3 font-display text-2xl font-bold uppercase tracking-tight text-asphalt-800">
               {BUSINESS.addressLine1}
             </p>
@@ -183,9 +173,9 @@ export default async function HomePage() {
       <section className="bg-cream-200 py-16">
         <div className="container-page">
           <Reveal>
-            <span className="eyebrow">What Our Customers Say</span>
+            <span className="eyebrow">{content("home.testimonials_eyebrow")}</span>
             <h2 className="mt-3 max-w-xl font-display text-3xl font-bold uppercase tracking-tight text-asphalt-800 sm:text-4xl">
-              Trusted by drivers across Melbourne&apos;s west
+              {content("home.testimonials_heading")}
             </h2>
           </Reveal>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -229,10 +219,10 @@ export default async function HomePage() {
         <Reveal className="container-page flex flex-col items-center justify-between gap-6 py-12 text-center md:flex-row md:text-left">
           <div>
             <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl">
-              Ready to book your vehicle in?
+              {content("home.cta_heading")}
             </h2>
             <p className="mt-1 text-sm font-medium text-cream-100/70">
-              Pick a service and time that works for you — takes about two minutes.
+              {content("home.cta_subtext")}
             </p>
           </div>
           <Link href="/book" className="btn-primary shrink-0">

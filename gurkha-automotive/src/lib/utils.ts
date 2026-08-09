@@ -4,6 +4,22 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
+/** Non-empty lines of an admin-entered textarea, e.g. a bullet list. */
+export function splitLines(value: string): string[] {
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+/** Paragraphs of an admin-entered textarea, separated by a blank line. */
+export function splitParagraphs(value: string): string[] {
+  return value
+    .split(/\r?\n\s*\r?\n/)
+    .map((para) => para.trim())
+    .filter(Boolean);
+}
+
 export function formatDateDisplay(dateStr: string): string {
   const [year, month, day] = dateStr.split("-").map(Number);
   const date = new Date(year, month - 1, day);

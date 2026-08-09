@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { BUSINESS, OPENING_HOURS, formatOpeningHoursRange } from "@/lib/constants";
+import { getSiteContent } from "@/lib/data";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 
@@ -10,16 +11,17 @@ export const metadata: Metadata = {
     `Contact ${BUSINESS.name}, your local mechanic in Sunshine North. Call, email or visit our workshop to discuss car service, repairs or roadworthy inspections.`,
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const content = await getSiteContent();
   const mapQuery = encodeURIComponent(BUSINESS.fullAddress);
 
   return (
     <>
       <section className="bg-asphalt-800 py-16 text-cream-100">
         <div className="container-page">
-          <span className="eyebrow-on-dark">Get In Touch</span>
+          <span className="eyebrow-on-dark">{content("contact.hero_eyebrow")}</span>
           <h1 className="mt-3 font-display text-4xl font-bold uppercase tracking-tight sm:text-5xl">
-            Contact Us
+            {content("contact.hero_heading")}
           </h1>
         </div>
       </section>
@@ -39,7 +41,7 @@ export default function ContactPage() {
 
             <div className="card-panel p-6">
               <h2 className="font-display text-lg font-semibold uppercase text-asphalt-800">
-                Workshop Details
+                {content("contact.details_heading")}
               </h2>
               <dl className="mt-4 space-y-3 text-sm text-steel-500">
                 <div>

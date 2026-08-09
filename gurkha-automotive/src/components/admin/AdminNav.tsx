@@ -9,6 +9,7 @@ export default function AdminNav() {
   const pathname = usePathname();
   const onBookings = pathname === "/admin/dashboard";
   const onServices = pathname?.startsWith("/admin/dashboard/services") ?? false;
+  const onContent = pathname?.startsWith("/admin/dashboard/content") ?? false;
 
   return (
     <nav className="flex items-center gap-1.5 sm:gap-3">
@@ -29,6 +30,14 @@ export default function AdminNav() {
         className={cn("btn-primary !px-4 !py-2 !text-xs", onServices && "!bg-pit-600")}
       >
         Manage Services
+      </Link>
+
+      <Link
+        href="/admin/dashboard/content"
+        aria-current={onContent ? "page" : undefined}
+        className={cn("btn-primary !px-4 !py-2 !text-xs", onContent && "!bg-pit-600")}
+      >
+        Page Content
       </Link>
 
       <span className="mx-1 hidden h-5 w-px bg-cream-100/15 sm:block" aria-hidden="true" />
