@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function SignOutButton() {
+/** `className` lets the mobile admin menu give this the same row shape as the links. */
+export default function SignOutButton({ className }: { className?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +22,10 @@ export default function SignOutButton() {
       type="button"
       onClick={handleSignOut}
       disabled={loading}
-      className="text-xs font-bold uppercase tracking-wide text-cream-100/70 hover:text-amber-400 disabled:opacity-50"
+      className={
+        className ??
+        "text-xs font-bold uppercase tracking-wide text-cream-100/70 hover:text-amber-400 disabled:opacity-50"
+      }
     >
       {loading ? "Signing out…" : "Sign Out"}
     </button>

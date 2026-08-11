@@ -59,7 +59,7 @@ export default function ManageServices({ services }: { services: Service[] }) {
             setAdding((v) => !v);
             setEditingId(null);
           }}
-          className="btn-primary"
+          className="btn-primary w-full sm:w-auto"
         >
           {adding ? "Cancel" : "+ Add Service"}
         </button>
@@ -77,7 +77,7 @@ export default function ManageServices({ services }: { services: Service[] }) {
       )}
 
       {adding && (
-        <div className="card-panel mb-6 p-6">
+        <div className="card-panel mb-6 p-4 sm:p-6">
           <h2 className="mb-4 font-display text-lg font-bold uppercase tracking-tight text-asphalt-800">
             New Service
           </h2>
@@ -97,14 +97,18 @@ export default function ManageServices({ services }: { services: Service[] }) {
         <div className="space-y-3">
           {services.map((service, index) => (
             <div key={service.id} className="card-panel overflow-hidden">
-              <div className="flex flex-wrap items-center gap-4 p-4">
-                <div className="flex flex-col gap-1">
+              {/*
+                On phones this stacks into details → reorder → actions; from sm
+                up it is the original single wrapping row.
+              */}
+              <div className="flex flex-col gap-3 p-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                <div className="order-2 flex items-center gap-2 sm:order-none sm:flex-col sm:gap-1">
                   <button
                     type="button"
                     aria-label={`Move ${service.name} up`}
                     disabled={index === 0 || isPending}
                     onClick={() => run(() => moveService(service.id, "up"))}
-                    className="rounded-sm border border-cream-300 px-2 py-0.5 text-xs text-steel-500 transition-colors hover:border-amber-500 hover:text-amber-600 disabled:cursor-not-allowed disabled:opacity-30"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-cream-300 text-sm text-steel-500 transition-colors hover:border-amber-500 hover:text-amber-600 disabled:cursor-not-allowed disabled:opacity-30 sm:h-auto sm:w-auto sm:px-2 sm:py-0.5 sm:text-xs"
                   >
                     ▲
                   </button>
@@ -113,13 +117,13 @@ export default function ManageServices({ services }: { services: Service[] }) {
                     aria-label={`Move ${service.name} down`}
                     disabled={index === services.length - 1 || isPending}
                     onClick={() => run(() => moveService(service.id, "down"))}
-                    className="rounded-sm border border-cream-300 px-2 py-0.5 text-xs text-steel-500 transition-colors hover:border-amber-500 hover:text-amber-600 disabled:cursor-not-allowed disabled:opacity-30"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-cream-300 text-sm text-steel-500 transition-colors hover:border-amber-500 hover:text-amber-600 disabled:cursor-not-allowed disabled:opacity-30 sm:h-auto sm:w-auto sm:px-2 sm:py-0.5 sm:text-xs"
                   >
                     ▼
                   </button>
                 </div>
 
-                <div className="min-w-0 flex-1">
+                <div className="order-1 min-w-0 flex-1 sm:order-none">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-display text-sm font-semibold uppercase text-asphalt-800">
                       {service.name}
@@ -130,7 +134,8 @@ export default function ManageServices({ services }: { services: Service[] }) {
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 truncate text-xs text-steel-500">
+                  {/* Wraps in full on phones; stays a single clipped line from sm up. */}
+                  <p className="mt-1 text-sm text-steel-500 sm:mt-0.5 sm:truncate sm:text-xs">
                     {service.description ?? "No description"}
                   </p>
                   <p className="mt-1 font-mono text-xs text-steel-400">
@@ -139,7 +144,7 @@ export default function ManageServices({ services }: { services: Service[] }) {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="order-3 grid grid-cols-3 gap-2 sm:order-none sm:flex sm:flex-wrap sm:items-center">
                   <button
                     type="button"
                     disabled={isPending}
@@ -147,7 +152,7 @@ export default function ManageServices({ services }: { services: Service[] }) {
                       setEditingId(editingId === service.id ? null : service.id);
                       setAdding(false);
                     }}
-                    className="btn-secondary !border-steel-400/40 !text-asphalt-800 hover:!border-amber-500 hover:!text-amber-600"
+                    className="btn-secondary !px-2 !border-steel-400/40 !text-asphalt-800 hover:!border-amber-500 hover:!text-amber-600 sm:!px-6"
                   >
                     {editingId === service.id ? "Close" : "Edit"}
                   </button>
@@ -155,7 +160,7 @@ export default function ManageServices({ services }: { services: Service[] }) {
                     type="button"
                     disabled={isPending}
                     onClick={() => run(() => setServiceActive(service.id, !service.is_active))}
-                    className="btn-secondary !border-steel-400/40 !text-asphalt-800 hover:!border-amber-500 hover:!text-amber-600"
+                    className="btn-secondary !px-2 !border-steel-400/40 !text-asphalt-800 hover:!border-amber-500 hover:!text-amber-600 sm:!px-6"
                   >
                     {service.is_active ? "Hide" : "Show"}
                   </button>
@@ -171,7 +176,7 @@ export default function ManageServices({ services }: { services: Service[] }) {
                         return;
                       run(() => deleteService(service.id));
                     }}
-                    className="btn-secondary !border-rust-600/40 !text-rust-600 hover:!border-rust-600 hover:!bg-rust-600/5"
+                    className="btn-secondary !px-2 !border-rust-600/40 !text-rust-600 hover:!border-rust-600 hover:!bg-rust-600/5 sm:!px-6"
                   >
                     Delete
                   </button>
@@ -179,7 +184,7 @@ export default function ManageServices({ services }: { services: Service[] }) {
               </div>
 
               {editingId === service.id && (
-                <div className="border-t border-cream-300 bg-cream-100 p-5">
+                <div className="border-t border-cream-300 bg-cream-100 p-4 sm:p-5">
                   <ServiceForm
                     service={service}
                     busy={isPending}
@@ -301,15 +306,15 @@ function ServiceForm({
         </label>
       </div>
 
-      <div className="flex gap-3 sm:col-span-2">
-        <button type="submit" disabled={busy} className="btn-primary">
+      <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row">
+        <button type="submit" disabled={busy} className="btn-primary w-full sm:w-auto">
           {busy ? "Saving…" : service ? "Save Changes" : "Add Service"}
         </button>
         <button
           type="button"
           onClick={onCancel}
           disabled={busy}
-          className="btn-secondary !border-steel-400/40 !text-asphalt-800"
+          className="btn-secondary w-full !border-steel-400/40 !text-asphalt-800 sm:w-auto"
         >
           Cancel
         </button>

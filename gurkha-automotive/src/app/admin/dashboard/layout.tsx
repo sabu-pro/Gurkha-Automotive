@@ -11,7 +11,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         hidden for /admin/* by SiteChrome in the root layout.
       */}
       <header className="sticky top-0 z-50 border-b border-asphalt-600 bg-asphalt-900">
-        <div className="container-page flex h-16 items-center justify-between gap-4">
+        <div className="container-admin flex h-16 items-center justify-between gap-4">
           <Link href="/admin/dashboard" className="flex min-w-0 items-center gap-3">
             <Image
               src="/logo.png"
@@ -21,8 +21,9 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
               priority
               className="h-9 w-auto shrink-0"
             />
-            <span className="hidden h-6 w-px bg-cream-100/20 sm:block" aria-hidden="true" />
-            <span className="hidden font-display text-sm font-semibold uppercase tracking-[0.2em] text-cream-100/50 sm:block">
+            {/* The phone menu freed up the header row, so the wordmark fits there too. */}
+            <span className="h-6 w-px bg-cream-100/20" aria-hidden="true" />
+            <span className="font-display text-sm font-semibold uppercase tracking-[0.2em] text-cream-100/50">
               Admin
             </span>
           </Link>
@@ -31,7 +32,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         </div>
       </header>
 
-      <main className="container-page py-10">{children}</main>
+      <main className="container-admin py-8 sm:py-10">{children}</main>
     </div>
   );
 }

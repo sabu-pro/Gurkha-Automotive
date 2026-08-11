@@ -41,6 +41,15 @@
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 
+  /*
+    Same as .container-page from the sm breakpoint up, but with a little
+    more breathing room on phones so dashboard cards aren't tight against
+    the screen edges. Admin pages only.
+  */
+  .container-admin {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
   .eyebrow {
     @apply text-xs font-bold uppercase tracking-[0.2em] text-pit-500;
   }
