@@ -3,6 +3,14 @@ import Link from "next/link";
 import { BUSINESS, OPENING_HOURS, formatOpeningHoursRange } from "@/lib/constants";
 import Reveal from "@/components/Reveal";
 
+/*
+  Shared by every social button so the row stays identical in size, border
+  and hover — the icons inside carry their own brand colours, so the hover
+  works on the frame rather than on the fill.
+*/
+const SOCIAL_LINK =
+  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-cream-100/25 transition-all duration-200 ease-premium hover:-translate-y-0.5 hover:border-cream-100/45 hover:bg-cream-100/5 active:translate-y-0 motion-reduce:hover:translate-y-0";
+
 export default function Footer() {
   return (
     <footer className="bg-asphalt-900 text-cream-100">
@@ -19,6 +27,49 @@ export default function Footer() {
             Straightforward vehicle servicing and repairs for Sunshine North and the
             surrounding western suburbs.
           </p>
+
+          <h3 className="eyebrow-on-dark mt-8">Follow Us</h3>
+          <div className="mt-4 flex items-center gap-3">
+            <a
+              href={BUSINESS.facebookUrl}
+              target="_blank"
+              rel="noopener"
+              aria-label="Follow us on Facebook"
+              className={SOCIAL_LINK}
+            >
+              <svg aria-hidden="true" viewBox="0 0 320 512" fill="#1877F2" className="h-5 w-5">
+                <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
+              </svg>
+            </a>
+
+            <a
+              href={BUSINESS.googleBusinessUrl}
+              target="_blank"
+              rel="noopener"
+              aria-label="Find us on Google"
+              className={SOCIAL_LINK}
+            >
+              {/* Sized a touch smaller than the Facebook "f" so the two marks read as equal weight. */}
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-[18px] w-[18px]">
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"
+                />
+              </svg>
+            </a>
+          </div>
         </div>
 
         <div>
@@ -52,28 +103,9 @@ export default function Footer() {
             <Link href="/book" className="btn-primary">
               Book Appointment
             </Link>
-            <a
-              href={BUSINESS.facebookUrl}
-              target="_blank"
-              rel="noopener"
-              aria-label="Follow us on Facebook"
-              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-cream-100/25 text-cream-100/70 transition-all duration-200 ease-premium hover:-translate-y-0.5 hover:border-pit-400 hover:text-pit-400 active:translate-y-0 motion-reduce:hover:translate-y-0"
-            >
-              <svg aria-hidden="true" viewBox="0 0 320 512" fill="currentColor" className="h-5 w-5">
-                <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
-              </svg>
-            </a>
             <Link href="/admin/login" className="text-xs font-semibold uppercase tracking-wide text-cream-100/40 hover:text-cream-100/70 self-center">
               Admin
             </Link>
-            <a
-              href={BUSINESS.googleBusinessUrl}
-              target="_blank"
-              rel="noopener"
-              className="text-xs font-semibold uppercase tracking-wide text-cream-100/40 hover:text-cream-100/70 self-center"
-            >
-              Find us on Google
-            </a>
           </div>
         </div>
 
