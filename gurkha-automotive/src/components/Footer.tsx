@@ -52,6 +52,17 @@ export default function Footer() {
             <Link href="/book" className="btn-primary">
               Book Appointment
             </Link>
+            <a
+              href={BUSINESS.facebookUrl}
+              target="_blank"
+              rel="noopener"
+              aria-label="Follow us on Facebook"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-cream-100/25 text-cream-100/70 transition-all duration-200 ease-premium hover:-translate-y-0.5 hover:border-pit-400 hover:text-pit-400 active:translate-y-0 motion-reduce:hover:translate-y-0"
+            >
+              <svg aria-hidden="true" viewBox="0 0 320 512" fill="currentColor" className="h-5 w-5">
+                <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
+              </svg>
+            </a>
             <Link href="/admin/login" className="text-xs font-semibold uppercase tracking-wide text-cream-100/40 hover:text-cream-100/70 self-center">
               Admin
             </Link>

@@ -14,6 +14,7 @@ export const BUSINESS = {
   email: "gurkhaautomotive@gmail.com",
   emailHref: "mailto:gurkhaautomotive@gmail.com",
   googleBusinessUrl: "https://share.google/HgWBBinjZFqhQzige",
+  facebookUrl: "https://www.facebook.com/gurkhaautomotive/",
 } as const;
 
 export type DayHours = {
@@ -84,6 +85,6 @@ export function getLocalBusinessJsonLd(siteUrl: string) {
       opens: h.open,
       closes: h.close,
     })),
-    sameAs: [BUSINESS.googleBusinessUrl],
+    sameAs: [BUSINESS.googleBusinessUrl, BUSINESS.facebookUrl],
   };
 }
