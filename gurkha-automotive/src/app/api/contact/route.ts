@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getResendClient } from "@/lib/resend";
 import { BUSINESS } from "@/lib/constants";
+import { escapeHtml } from "@/lib/utils";
 import { domainAcceptsMail, optionalPhoneSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
@@ -70,13 +71,4 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ ok: true });
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }

@@ -85,3 +85,13 @@ const STATUS_LABELS: Record<string, string> = {
 export function statusLabel(status: string): string {
   return STATUS_LABELS[status] ?? status;
 }
+
+/** Escape a user-supplied value before interpolating it into email HTML. */
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}

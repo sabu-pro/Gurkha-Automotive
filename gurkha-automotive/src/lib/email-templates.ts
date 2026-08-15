@@ -1,5 +1,5 @@
 import { BUSINESS } from "@/lib/constants";
-import { formatDateDisplay, formatTimeDisplay } from "@/lib/utils";
+import { escapeHtml, formatDateDisplay, formatTimeDisplay } from "@/lib/utils";
 import type { Booking, Service } from "@/lib/types";
 
 type BookingWithService = Booking & { service?: Service };
@@ -46,17 +46,25 @@ function layout(bodyHtml: string, preheader: string): string {
 </html>`;
 }
 
+/** First name for a greeting, escaped for safe interpolation into HTML. */
+function greetingName(booking: BookingWithService): string {
+  return escapeHtml(booking.customer_name.split(" ")[0]);
+}
+
 function detailsTable(booking: BookingWithService): string {
   const rows: [string, string][] = [
     ["Service", booking.service?.name ?? "—"],
     ["Date", formatDateDisplay(booking.booking_date)],
     ["Time", formatTimeDisplay(booking.start_time)],
-    ["Vehicle", `${booking.vehicle_make} ${booking.vehicle_model} (${booking.vehicle_rego})`],
-    ["Name", booking.customer_name],
-    ["Phone", booking.customer_phone],
-    ["Email", booking.customer_email],
+    [
+      "Vehicle",
+      `${escapeHtml(booking.vehicle_make)} ${escapeHtml(booking.vehicle_model)} (${escapeHtml(booking.vehicle_rego)})`,
+    ],
+    ["Name", escapeHtml(booking.customer_name)],
+    ["Phone", escapeHtml(booking.customer_phone)],
+    ["Email", escapeHtml(booking.customer_email)],
   ];
-  if (booking.notes) rows.push(["Notes", booking.notes]);
+  if (booking.notes) rows.push(["Notes", escapeHtml(booking.notes)]);
 
   const rowsHtml = rows
     .map(
@@ -76,11 +84,11 @@ export function customerBookingReceivedEmail(booking: BookingWithService): {
   html: string;
 } {
   const body = `
-    <h1 style="font-size:20px;margin:0 0 8px;">Thanks, ${booking.customer_name.split(" ")[0]}. We've got your booking request.</h1>
+    <h1 style="font-size:20px;margin:0 0 8px;">Thanks, ${greetingName(booking)}. We've got your booking request.</h1>
     <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
       We've received your request and it's currently <strong>pending confirmation</strong>.
       Our team will review it and send you a confirmation email shortly. If your requested time
-      isn't available, we'll call you on ${booking.customer_phone} to arrange another slot.
+      isn't available, we'll call you on ${escapeHtml(booking.customer_phone)} to arrange another slot.
     </p>
     ${detailsTable(booking)}
     <p style="font-size:13px;line-height:1.6;color:#5A6B7A;margin-top:20px;">
@@ -117,8 +125,8 @@ export function customerBookingConfirmedEmail(booking: BookingWithService): {
   const body = `
     <h1 style="font-size:20px;margin:0 0 8px;color:#25774A;">Booking confirmed ✓</h1>
     <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
-      Good news, ${booking.customer_name.split(" ")[0]} — your appointment is confirmed. We look
-      forward to seeing you and your ${booking.vehicle_make} ${booking.vehicle_model}.
+      Good news, ${greetingName(booking)} — your appointment is confirmed. We look
+      forward to seeing you and your ${escapeHtml(booking.vehicle_make)} ${escapeHtml(booking.vehicle_model)}.
     </p>
     ${detailsTable(booking)}
     <p style="font-size:13px;line-height:1.6;color:#5A6B7A;margin-top:20px;">
@@ -138,7 +146,7 @@ export function customerBookingCancelledEmail(booking: BookingWithService): {
   const body = `
     <h1 style="font-size:20px;margin:0 0 8px;color:#A93030;">Booking cancelled</h1>
     <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
-      Hi ${booking.customer_name.split(" ")[0]}, your appointment below has been cancelled.
+      Hi ${greetingName(booking)}, your appointment below has been cancelled.
       If this wasn't expected, or you'd like to rebook, please call us on ${BUSINESS.phone}.
     </p>
     ${detailsTable(booking)}
