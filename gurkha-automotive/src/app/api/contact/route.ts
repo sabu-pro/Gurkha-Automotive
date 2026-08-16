@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getResendClient } from "@/lib/resend";
 import { BUSINESS } from "@/lib/constants";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/utils";
 import { domainAcceptsMail, optionalPhoneSchema } from "@/lib/validation";
 
@@ -15,6 +16,14 @@ const contactSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const { allowed } = await checkRateLimit(request, "contact", 3, 60);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment and try again." },
+      { status: 429 }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();

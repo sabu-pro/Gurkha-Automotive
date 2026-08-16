@@ -3,12 +3,21 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { bookingRequestSchema, domainAcceptsMail } from "@/lib/validation";
 import { computeEndTime } from "@/lib/availability";
 import { sendBookingReceivedEmails } from "@/lib/email";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { timeToMinutes, todayIsoDate } from "@/lib/utils";
 import type { Booking, Service } from "@/lib/types";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  const { allowed } = await checkRateLimit(request, "bookings", 5, 60);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment and try again." },
+      { status: 429 }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
