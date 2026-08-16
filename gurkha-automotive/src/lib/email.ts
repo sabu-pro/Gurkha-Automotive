@@ -13,12 +13,20 @@ function fromAddress(): string {
   return process.env.RESEND_FROM_EMAIL ?? "Gurkha Automotive <onboarding@resend.dev>";
 }
 
-function garageInbox(): string {
-  const address = process.env.GARAGE_NOTIFICATION_EMAIL;
-  if (!address) {
+/**
+ * The garage's notification inbox(es). GARAGE_NOTIFICATION_EMAIL holds a
+ * single address, or several separated by commas. Throws if none are set.
+ */
+export function garageInboxes(): string[] {
+  const addresses = (process.env.GARAGE_NOTIFICATION_EMAIL ?? "")
+    .split(",")
+    .map((address) => address.trim())
+    .filter((address) => address.length > 0);
+
+  if (addresses.length === 0) {
     throw new Error("GARAGE_NOTIFICATION_EMAIL is not set.");
   }
-  return address;
+  return addresses;
 }
 
 /**
@@ -41,7 +49,7 @@ export async function sendBookingReceivedEmails(booking: BookingWithService): Pr
     }),
     resend.emails.send({
       from: fromAddress(),
-      to: garageInbox(),
+      to: garageInboxes(),
       subject: garageEmail.subject,
       html: garageEmail.html,
     }),

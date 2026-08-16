@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getResendClient } from "@/lib/resend";
+import { garageInboxes } from "@/lib/email";
 import { BUSINESS } from "@/lib/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { escapeHtml } from "@/lib/utils";
@@ -48,10 +49,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const garageInbox = process.env.GARAGE_NOTIFICATION_EMAIL;
   const fromAddress = process.env.RESEND_FROM_EMAIL ?? "Gurkha Automotive <onboarding@resend.dev>";
 
-  if (!garageInbox) {
+  let garageInbox: string[];
+  try {
+    garageInbox = garageInboxes();
+  } catch {
     console.error("GARAGE_NOTIFICATION_EMAIL is not set.");
     return NextResponse.json({ error: "Enquiries are temporarily unavailable. Please call us instead." }, { status: 500 });
   }
