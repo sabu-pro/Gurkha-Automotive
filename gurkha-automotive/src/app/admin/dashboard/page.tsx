@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { getAdminSession } from "@/lib/auth";
 import BookingsDashboard from "@/components/admin/BookingsDashboard";
 import { todayIsoDate } from "@/lib/utils";
 import type { Booking, Service } from "@/lib/types";
@@ -12,9 +12,12 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient();
+  // The layout already gates on admin access; re-check so this page's
+  // data can never be rendered on its own for a non-admin.
+  const session = await getAdminSession();
+  if (!session.ok) return null;
 
-  const { data, error } = await supabase
+  const { data, error } = await session.supabase
     .from("bookings")
     .select("*, service:services(*)")
     .order("booking_date", { ascending: true })
@@ -22,13 +25,15 @@ export default async function AdminDashboardPage() {
 
   const bookings = (data ?? []) as unknown as (Booking & { service: Service })[];
 
+  // Melbourne's "today", computed once on the server and handed to the
+  // client so both agree (and Vercel's UTC clock doesn't shift it).
   const today = todayIsoDate();
   const stats = {
-    today: bookings.filter((b) => b.booking_date === today && b.status !== "cancelled").length,
+    today: bookings.filter((b) => b.booking_date === today && (b.status === "pending" || b.status === "confirmed")).length,
     upcoming: bookings.filter((b) => b.booking_date > today && (b.status === "pending" || b.status === "confirmed")).length,
     pending: bookings.filter((b) => b.status === "pending").length,
     completed: bookings.filter((b) => b.status === "completed").length,
-    cancelled: bookings.filter((b) => b.status === "cancelled").length,
+    cancelled: bookings.filter((b) => b.status === "cancelled" || b.status === "rejected").length,
   };
 
   return (
@@ -47,7 +52,7 @@ export default async function AdminDashboardPage() {
         <StatCard label="Upcoming" value={stats.upcoming} />
         <StatCard label="Pending" value={stats.pending} accent="amber" />
         <StatCard label="Completed" value={stats.completed} accent="pit" />
-        <StatCard label="Cancelled" value={stats.cancelled} accent="rust" />
+        <StatCard label="Cancelled / Rejected" value={stats.cancelled} accent="rust" />
       </div>
 
       {error ? (
@@ -55,7 +60,7 @@ export default async function AdminDashboardPage() {
           Could not load bookings: {error.message}
         </div>
       ) : (
-        <BookingsDashboard initialBookings={bookings} />
+        <BookingsDashboard initialBookings={bookings} today={today} />
       )}
     </div>
   );

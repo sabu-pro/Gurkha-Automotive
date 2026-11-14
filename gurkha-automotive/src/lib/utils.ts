@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { businessNow } from "@/lib/time";
 
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
@@ -50,9 +51,9 @@ export function formatCurrencyFromCents(cents: number | null): string {
   }).format(cents / 100);
 }
 
+/** Today's date in the workshop's timezone (Melbourne), YYYY-MM-DD — not the server's. */
 export function todayIsoDate(): string {
-  const now = new Date();
-  return toIsoDate(now);
+  return businessNow().isoDate;
 }
 
 export function toIsoDate(date: Date): string {
@@ -78,6 +79,7 @@ export function timeToMinutes(time: string): number {
 const STATUS_LABELS: Record<string, string> = {
   pending: "Pending",
   confirmed: "Confirmed",
+  rejected: "Rejected",
   completed: "Completed",
   cancelled: "Cancelled",
 };

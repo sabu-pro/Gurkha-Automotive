@@ -1,8 +1,13 @@
 import { BUSINESS } from "@/lib/constants";
-import { escapeHtml, formatDateDisplay, formatTimeDisplay } from "@/lib/utils";
+import { escapeHtml, formatDateDisplay, formatTimeDisplay, statusLabel } from "@/lib/utils";
 import type { Booking, Service } from "@/lib/types";
 
-type BookingWithService = Booking & { service?: Service };
+export type BookingWithService = Booking & { service?: Service | null };
+
+export interface EmailContent {
+  subject: string;
+  html: string;
+}
 
 function layout(bodyHtml: string, preheader: string): string {
   return `<!doctype html>
@@ -51,20 +56,30 @@ function greetingName(booking: BookingWithService): string {
   return escapeHtml(booking.customer_name.split(" ")[0]);
 }
 
+/** Multi-line customer/staff text, escaped, with line breaks kept. */
+function paragraphText(value: string): string {
+  return escapeHtml(value).replace(/\r?\n/g, "<br />");
+}
+
+function vehicleLine(booking: BookingWithService): string {
+  const year = booking.vehicle_year ? `${booking.vehicle_year} ` : "";
+  return `${year}${escapeHtml(booking.vehicle_make)} ${escapeHtml(booking.vehicle_model)} (${escapeHtml(booking.vehicle_rego)})`;
+}
+
 function detailsTable(booking: BookingWithService): string {
   const rows: [string, string][] = [
-    ["Service", booking.service?.name ?? "—"],
+    ["Reference", `<span style="font-family:monospace;letter-spacing:1px;">${escapeHtml(booking.reference)}</span>`],
+    ["Status", escapeHtml(statusLabel(booking.status))],
+    ["Service", escapeHtml(booking.service?.name ?? "—")],
     ["Date", formatDateDisplay(booking.booking_date)],
     ["Time", formatTimeDisplay(booking.start_time)],
-    [
-      "Vehicle",
-      `${escapeHtml(booking.vehicle_make)} ${escapeHtml(booking.vehicle_model)} (${escapeHtml(booking.vehicle_rego)})`,
-    ],
+    ["Vehicle", vehicleLine(booking)],
     ["Name", escapeHtml(booking.customer_name)],
     ["Phone", escapeHtml(booking.customer_phone)],
     ["Email", escapeHtml(booking.customer_email)],
   ];
-  if (booking.notes) rows.push(["Notes", escapeHtml(booking.notes)]);
+  if (booking.problem_description) rows.push(["Problem", paragraphText(booking.problem_description)]);
+  if (booking.notes) rows.push(["Comments", paragraphText(booking.notes)]);
 
   const rowsHtml = rows
     .map(
@@ -79,49 +94,52 @@ function detailsTable(booking: BookingWithService): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;border-top:1px solid #EDE9E0;">${rowsHtml}</table>`;
 }
 
-export function customerBookingReceivedEmail(booking: BookingWithService): {
-  subject: string;
-  html: string;
-} {
+function staffMessage(booking: BookingWithService): string {
+  if (!booking.status_reason) return "";
+  return `
+    <div style="margin-top:16px;padding:12px 16px;background-color:#F6F4EF;border-left:3px solid #F2A71B;">
+      <p style="margin:0 0 4px;font-size:12px;color:#5A6B7A;text-transform:uppercase;letter-spacing:1px;">Message from our team</p>
+      <p style="margin:0;font-size:14px;line-height:1.6;color:#16181B;">${paragraphText(booking.status_reason)}</p>
+    </div>`;
+}
+
+export function customerBookingReceivedEmail(booking: BookingWithService): EmailContent {
   const body = `
     <h1 style="font-size:20px;margin:0 0 8px;">Thanks, ${greetingName(booking)}. We've got your booking request.</h1>
     <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
-      We've received your request and it's currently <strong>pending confirmation</strong>.
-      Our team will review it and send you a confirmation email shortly. If your requested time
-      isn't available, we'll call you on ${escapeHtml(booking.customer_phone)} to arrange another slot.
+      Your request is <strong>pending</strong> — it is not a confirmed appointment yet.
+      Our team will review it and email you once it's confirmed. If your requested time
+      isn't available, we'll contact you on ${escapeHtml(booking.customer_phone)} to arrange another slot.
     </p>
     ${detailsTable(booking)}
     <p style="font-size:13px;line-height:1.6;color:#5A6B7A;margin-top:20px;">
+      Please quote reference <strong>${escapeHtml(booking.reference)}</strong> if you contact us.
       Need to change anything? Call us on ${BUSINESS.phone}.
     </p>
   `;
   return {
-    subject: `We've received your booking request — ${BUSINESS.name}`,
+    subject: `Booking request received (${booking.reference}) — ${BUSINESS.name}`,
     html: layout(body, "Your booking request has been received and is pending confirmation."),
   };
 }
 
-export function garageNewBookingEmail(booking: BookingWithService): {
-  subject: string;
-  html: string;
-} {
+export function garageNewBookingEmail(booking: BookingWithService): EmailContent {
+  const via = booking.source === "assistant" ? " via the booking assistant" : "";
   const body = `
     <h1 style="font-size:20px;margin:0 0 8px;">New booking request</h1>
     <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
-      A new booking has come in and is waiting for review in the admin dashboard.
+      A new booking request has come in${via} and is waiting for review in the admin dashboard.
+      The customer has been told it is pending until you confirm it.
     </p>
     ${detailsTable(booking)}
   `;
   return {
-    subject: `New booking: ${booking.customer_name} — ${formatDateDisplay(booking.booking_date)}`,
+    subject: `New booking request ${booking.reference}: ${booking.customer_name} — ${formatDateDisplay(booking.booking_date)}`,
     html: layout(body, "A new booking request needs your review."),
   };
 }
 
-export function customerBookingConfirmedEmail(booking: BookingWithService): {
-  subject: string;
-  html: string;
-} {
+export function customerBookingConfirmedEmail(booking: BookingWithService): EmailContent {
   const body = `
     <h1 style="font-size:20px;margin:0 0 8px;color:#25774A;">Booking confirmed ✓</h1>
     <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
@@ -130,29 +148,73 @@ export function customerBookingConfirmedEmail(booking: BookingWithService): {
     </p>
     ${detailsTable(booking)}
     <p style="font-size:13px;line-height:1.6;color:#5A6B7A;margin-top:20px;">
-      Running late or need to reschedule? Call us on ${BUSINESS.phone}.
+      Running late or need to reschedule? Call us on ${BUSINESS.phone} and quote ${escapeHtml(booking.reference)}.
     </p>
   `;
   return {
-    subject: `Booking confirmed — ${formatDateDisplay(booking.booking_date)} — ${BUSINESS.name}`,
+    subject: `Booking confirmed (${booking.reference}) — ${formatDateDisplay(booking.booking_date)} — ${BUSINESS.name}`,
     html: layout(body, "Your appointment has been confirmed."),
   };
 }
 
-export function customerBookingCancelledEmail(booking: BookingWithService): {
-  subject: string;
-  html: string;
-} {
+export function customerBookingRejectedEmail(booking: BookingWithService): EmailContent {
+  const body = `
+    <h1 style="font-size:20px;margin:0 0 8px;color:#A93030;">We can't take this booking</h1>
+    <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
+      Hi ${greetingName(booking)}, unfortunately we're unable to accept the booking request below.
+      Please call us on ${BUSINESS.phone} and we'll do our best to find another option for you.
+    </p>
+    ${staffMessage(booking)}
+    ${detailsTable(booking)}
+  `;
+  return {
+    subject: `About your booking request (${booking.reference}) — ${BUSINESS.name}`,
+    html: layout(body, "We're unable to accept your booking request."),
+  };
+}
+
+export function customerBookingRescheduledEmail(
+  booking: BookingWithService,
+  previous: { booking_date: string; start_time: string }
+): EmailContent {
+  const confirmed = booking.status === "confirmed";
+  const heading = confirmed ? "Your appointment has a new time" : "Your booking request has a new time";
+  const statusSentence = confirmed
+    ? "Your appointment is <strong>confirmed</strong> for the new time below."
+    : `Your request is still <strong>${escapeHtml(statusLabel(booking.status).toLowerCase())}</strong> — we'll email you again once it's confirmed.`;
+
+  const body = `
+    <h1 style="font-size:20px;margin:0 0 8px;">${heading}</h1>
+    <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
+      Hi ${greetingName(booking)}, we've moved your booking from
+      ${formatDateDisplay(previous.booking_date)} at ${formatTimeDisplay(previous.start_time)} to
+      <strong>${formatDateDisplay(booking.booking_date)} at ${formatTimeDisplay(booking.start_time)}</strong>.
+      ${statusSentence}
+    </p>
+    ${staffMessage(booking)}
+    ${detailsTable(booking)}
+    <p style="font-size:13px;line-height:1.6;color:#5A6B7A;margin-top:20px;">
+      If the new time doesn't suit you, please call us on ${BUSINESS.phone} and quote ${escapeHtml(booking.reference)}.
+    </p>
+  `;
+  return {
+    subject: `New time for your booking (${booking.reference}) — ${formatDateDisplay(booking.booking_date)} — ${BUSINESS.name}`,
+    html: layout(body, "Your booking has been moved to a new time."),
+  };
+}
+
+export function customerBookingCancelledEmail(booking: BookingWithService): EmailContent {
   const body = `
     <h1 style="font-size:20px;margin:0 0 8px;color:#A93030;">Booking cancelled</h1>
     <p style="font-size:14px;line-height:1.6;color:#3A3F45;margin:0;">
       Hi ${greetingName(booking)}, your appointment below has been cancelled.
       If this wasn't expected, or you'd like to rebook, please call us on ${BUSINESS.phone}.
     </p>
+    ${staffMessage(booking)}
     ${detailsTable(booking)}
   `;
   return {
-    subject: `Booking cancelled — ${formatDateDisplay(booking.booking_date)} — ${BUSINESS.name}`,
+    subject: `Booking cancelled (${booking.reference}) — ${formatDateDisplay(booking.booking_date)} — ${BUSINESS.name}`,
     html: layout(body, "Your appointment has been cancelled."),
   };
 }

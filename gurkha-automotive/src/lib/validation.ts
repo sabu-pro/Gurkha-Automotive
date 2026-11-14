@@ -1,31 +1,47 @@
 import { z } from "zod";
 import { resolveMx, resolve4 } from "node:dns/promises";
+import { isValidAuPhone } from "@/lib/phone";
+import { BOOKING_STATUSES } from "@/lib/types";
+import { businessNow } from "@/lib/time";
+
+// The phone rules live in a browser-safe module so the chat assistant
+// and the booking form validate exactly as the server does.
+export { isValidAuPhone } from "@/lib/phone";
 
 // =================================================================
-// Phone number check — Australian mobile/landline shape, no library,
-// no API. Pure regex against real AU numbering patterns. This proves
-// the number is *structurally* a real, currently-allocated AU number
-// (rules out "1234567890" or a mistyped digit count) — it does not
-// prove this particular customer owns it. That level of proof needs
-// an SMS OTP step, which costs money per message, so it's
-// intentionally left out here.
+// Text hygiene
 // =================================================================
-export function isValidAuPhone(raw: string): boolean {
-  const normalized = raw
+// Values are only ever sent to Postgres as bound parameters (the
+// Supabase client never builds SQL strings), and are HTML-escaped
+// before going into emails. On top of that we reject invisible
+// control characters, which have no business in a name or a rego and
+// are a common ingredient in header-injection and spoofing tricks.
+const NO_CONTROL_CHARS = /^[^\u0000-\u001F\u007F]*$/;
+// Multi-line fields may keep tabs and line breaks.
+const NO_CONTROL_CHARS_MULTILINE = /^[^\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]*$/;
+const CONTROL_CHAR_MESSAGE = "Please remove any unusual characters and try again.";
+
+function singleLine(min: number, max: number, requiredMessage: string, tooLongMessage: string) {
+  return z
+    .string({ required_error: requiredMessage, invalid_type_error: requiredMessage })
     .trim()
-    .replace(/[\s()-]/g, "")
-    .replace(/^\+?61/, "0");
+    .min(min, requiredMessage)
+    .max(max, tooLongMessage)
+    .regex(NO_CONTROL_CHARS, CONTROL_CHAR_MESSAGE);
+}
 
-  // Mobile: 04XX XXX XXX (10 digits, starts 04)
-  if (/^04\d{8}$/.test(normalized)) return true;
-  // Landline: 0[2,3,7,8] XXXX XXXX (10 digits, valid AU area codes)
-  if (/^0[2378]\d{8}$/.test(normalized)) return true;
-
-  return false;
+function optionalMultiLine(max: number, tooLongMessage: string) {
+  return z
+    .string()
+    .trim()
+    .max(max, tooLongMessage)
+    .regex(NO_CONTROL_CHARS_MULTILINE, CONTROL_CHAR_MESSAGE)
+    .optional()
+    .or(z.literal(""));
 }
 
 const phoneSchema = z
-  .string()
+  .string({ required_error: "Please enter your phone number." })
   .trim()
   .min(8, "Please enter a valid phone number.")
   .max(20)
@@ -84,31 +100,94 @@ export async function domainAcceptsMail(email: string, timeoutMs = 3000): Promis
   }
 }
 
+export const VEHICLE_YEAR_MIN = 1950;
+
+/** Latest manufacturing year we accept: next year's models go on sale early. */
+export function maxVehicleYear(): number {
+  return businessNow().year + 1;
+}
+
+const isoDateSchema = z
+  .string({ required_error: "Please choose a date." })
+  .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Please choose a valid date." });
+
+const timeSchema = z
+  .string({ required_error: "Please choose a time." })
+  .regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/, { message: "Please choose a valid time." });
+
 export const bookingRequestSchema = z.object({
-  service_id: z.string().uuid({ message: "Please choose a service." }),
-  booking_date: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Please choose a valid date." }),
-  start_time: z
-    .string()
-    .regex(/^\d{2}:\d{2}(:\d{2})?$/, { message: "Please choose a valid time." }),
-  customer_name: z.string().trim().min(2, "Please enter your full name.").max(120),
-  customer_email: z.string().trim().email("Please enter a valid email address."),
+  service_id: z.string({ required_error: "Please choose a service." }).uuid({ message: "Please choose a service." }),
+  booking_date: isoDateSchema,
+  start_time: timeSchema,
+  customer_name: singleLine(2, 120, "Please enter your full name.", "Please shorten your name to 120 characters."),
+  customer_email: z
+    .string({ required_error: "Please enter your email address." })
+    .trim()
+    .max(254, "That email address is too long.")
+    .email("Please enter a valid email address.")
+    .transform((value) => value.toLowerCase()),
   customer_phone: phoneSchema,
-  vehicle_rego: z.string().trim().min(2, "Please enter the vehicle registration.").max(20),
-  vehicle_make: z.string().trim().min(1, "Please enter the vehicle make.").max(60),
-  vehicle_model: z.string().trim().min(1, "Please enter the vehicle model.").max(60),
-  notes: z.string().trim().max(1000).optional().or(z.literal("")),
+  vehicle_rego: singleLine(2, 10, "Please enter the vehicle registration.", "Registration numbers are 10 characters or fewer.")
+    .regex(/^[A-Za-z0-9 -]+$/, "Registration can only contain letters, numbers, spaces and dashes.")
+    .transform((value) => value.toUpperCase().replace(/\s+/g, " ")),
+  vehicle_make: singleLine(1, 60, "Please enter the vehicle make.", "Vehicle make must be 60 characters or fewer."),
+  vehicle_model: singleLine(1, 60, "Please enter the vehicle model.", "Vehicle model must be 60 characters or fewer."),
+  vehicle_year: z
+    .number({ invalid_type_error: "Please enter the year as four digits, e.g. 2018." })
+    .int("Please enter the year as four digits, e.g. 2018.")
+    .min(VEHICLE_YEAR_MIN, `Please enter a year from ${VEHICLE_YEAR_MIN} onwards.`)
+    .refine((year) => year <= maxVehicleYear(), { message: "That year is in the future — please check it." })
+    .nullable()
+    .optional(),
+  problem_description: optionalMultiLine(1000, "Please keep the problem description under 1000 characters."),
+  notes: optionalMultiLine(1000, "Please keep your comments under 1000 characters."),
+  // Generated by the browser once per booking attempt; a retry with the
+  // same id returns the original booking instead of creating another.
+  client_request_id: z.string().uuid().optional(),
+  source: z.enum(["web_form", "assistant"]).optional(),
+  // Honeypot. Real customers never see or fill this; bots that post
+  // every field do. The route rejects any non-empty value.
+  website: z.string().max(200).optional(),
 });
 
 export type BookingRequestInput = z.infer<typeof bookingRequestSchema>;
 
-export const bookingUpdateSchema = z.object({
-  status: z.enum(["pending", "confirmed", "completed", "cancelled"]).optional(),
-  admin_notes: z.string().trim().max(2000).optional(),
-});
+export const bookingUpdateSchema = z
+  .object({
+    status: z.enum(BOOKING_STATUSES).optional(),
+    admin_notes: z
+      .string()
+      .trim()
+      .max(2000, "Admin notes must be 2000 characters or fewer.")
+      .regex(NO_CONTROL_CHARS_MULTILINE, CONTROL_CHAR_MESSAGE)
+      .optional(),
+    // Reschedule: both or neither.
+    booking_date: isoDateSchema.optional(),
+    start_time: timeSchema.optional(),
+    // Optional message shown to the customer in the rejection or
+    // reschedule email (stored as status_reason).
+    customer_message: z
+      .string()
+      .trim()
+      .max(500, "The message to the customer must be 500 characters or fewer.")
+      .regex(NO_CONTROL_CHARS_MULTILINE, CONTROL_CHAR_MESSAGE)
+      .optional(),
+    notify_customer: z.boolean().optional(),
+  })
+  .strict()
+  .refine((data) => Boolean(data.booking_date) === Boolean(data.start_time), {
+    message: "Choose both a new date and a new time to reschedule.",
+    path: ["start_time"],
+  });
 
 export type BookingUpdateInput = z.infer<typeof bookingUpdateSchema>;
+
+/** The field a Zod error points at, so the UI can jump straight to it. */
+export function firstIssue(error: z.ZodError): { message: string; field?: string } {
+  const issue = error.issues[0];
+  const field = typeof issue?.path[0] === "string" ? issue.path[0] : undefined;
+  return { message: issue?.message ?? "Please check your details.", field };
+}
 
 // =================================================================
 // Services — admin-managed from the dashboard.

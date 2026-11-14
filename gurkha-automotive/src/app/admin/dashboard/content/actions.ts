@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getAdminSession } from "@/lib/auth";
 import { CONTENT_SECTIONS } from "@/lib/content-defaults";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; error: string };
@@ -21,12 +21,9 @@ function revalidateContentPages() {
  * on site_content at all.
  */
 async function requireAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  return supabase;
+  // Signed in AND listed in admin_users (see src/lib/auth.ts).
+  const session = await getAdminSession();
+  return session.ok ? session.supabase : null;
 }
 
 /** Guards against a caller inventing keys that aren't real content fields. */

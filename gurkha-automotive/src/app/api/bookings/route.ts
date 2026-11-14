@@ -1,168 +1,193 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { bookingRequestSchema, domainAcceptsMail } from "@/lib/validation";
-import { computeEndTime } from "@/lib/availability";
-import { sendBookingReceivedEmails } from "@/lib/email";
+import { bookingRequestSchema, domainAcceptsMail, firstIssue } from "@/lib/validation";
+import { checkSlot } from "@/lib/booking-scheduling";
+import {
+  countUpcomingActiveForContact,
+  findBookingByRequestId,
+  getActiveService,
+  recordBookingEvent,
+  RepositoryError,
+} from "@/lib/booking-repository";
+import { sendBookingReceivedEmails, type EmailResult } from "@/lib/email";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { timeToMinutes, todayIsoDate } from "@/lib/utils";
+import { formatAuPhone } from "@/lib/phone";
+import { todayIsoDate } from "@/lib/utils";
 import type { Booking, Service } from "@/lib/types";
 
 export const runtime = "nodejs";
 
+/** Upcoming pending/confirmed requests one email or phone may hold at once. */
+const MAX_ACTIVE_REQUESTS_PER_CONTACT = 3;
+
+/** Postgres SQLSTATEs surfaced by Supabase. */
+const PG_EXCLUSION_VIOLATION = "23P01"; // bookings_no_overlap: the slot was taken
+const PG_UNIQUE_VIOLATION = "23505"; // bookings_client_request_id_key: duplicate submission
+
+/**
+ * The only booking data returned to the browser: what the customer
+ * needs to see on screen, nothing else. Never includes other customers'
+ * data, admin notes or internal ids.
+ */
+function publicBooking(booking: Booking, service: Pick<Service, "name"> | null | undefined) {
+  return {
+    reference: booking.reference,
+    status: booking.status,
+    booking_date: booking.booking_date,
+    start_time: booking.start_time,
+    end_time: booking.end_time,
+    service_name: service?.name ?? null,
+  };
+}
+
+function error(message: string, status: number, extra: Record<string, unknown> = {}) {
+  return NextResponse.json({ error: message, ...extra }, { status });
+}
+
+async function logEmailOutcome(
+  db: ReturnType<typeof createAdminClient>,
+  bookingId: string,
+  label: string,
+  result: EmailResult
+) {
+  await recordBookingEvent(db, {
+    booking_id: bookingId,
+    event_type: result.sent ? "email_sent" : "email_failed",
+    detail: result.sent ? label : `${label}: ${result.error ?? "unknown error"}`,
+  });
+}
+
 export async function POST(request: NextRequest) {
   const { allowed } = await checkRateLimit(request, "bookings", 5, 60);
   if (!allowed) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment and try again." },
-      { status: 429 }
-    );
+    return error("Too many requests. Please wait a moment and try again.", 429, { code: "rate_limited" });
   }
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    return error("Invalid request body.", 400);
   }
 
   const parsed = bookingRequestSchema.safeParse(body);
   if (!parsed.success) {
-    const firstIssue = parsed.error.issues[0];
-    return NextResponse.json(
-      { error: firstIssue?.message ?? "Invalid booking details." },
-      { status: 400 }
-    );
+    const issue = firstIssue(parsed.error);
+    return error(issue.message, 400, { code: "invalid", field: issue.field });
   }
 
   const input = parsed.data;
 
-  if (input.booking_date < todayIsoDate()) {
-    return NextResponse.json({ error: "Please choose a date that isn't in the past." }, { status: 400 });
-  }
-
-  if (!(await domainAcceptsMail(input.customer_email))) {
-    return NextResponse.json(
-      { error: "That email address doesn't look valid — please check for typos." },
-      { status: 400 }
-    );
-  }
-
-  const supabase = createAdminClient();
-
-  const { data: service, error: serviceError } = await supabase
-    .from("services")
-    .select("*")
-    .eq("id", input.service_id)
-    .eq("is_active", true)
-    .maybeSingle();
-
-  if (serviceError) {
-    console.error(serviceError);
-    return NextResponse.json({ error: "Could not look up that service." }, { status: 500 });
-  }
-  if (!service) {
-    return NextResponse.json({ error: "That service is not available." }, { status: 400 });
-  }
-
-  const bookingDate = new Date(input.booking_date + "T00:00:00");
-  const dayOfWeek = bookingDate.getDay();
-
-  const { data: hours, error: hoursError } = await supabase
-    .from("business_hours")
-    .select("*")
-    .eq("day_of_week", dayOfWeek)
-    .maybeSingle();
-
-  if (hoursError) {
-    console.error(hoursError);
-    return NextResponse.json({ error: "Could not check opening hours." }, { status: 500 });
-  }
-  if (!hours || hours.is_closed || !hours.open_time || !hours.close_time) {
-    return NextResponse.json({ error: "We're closed on that day." }, { status: 400 });
-  }
-
-  const { data: blocked } = await supabase
-    .from("blocked_dates")
-    .select("id")
-    .eq("blocked_date", input.booking_date)
-    .maybeSingle();
-
-  if (blocked) {
-    return NextResponse.json({ error: "We're closed on that date." }, { status: 400 });
-  }
-
-  const startTime = input.start_time.length === 5 ? `${input.start_time}:00` : input.start_time;
-  const endTime = computeEndTime(startTime, service.duration_minutes);
-
-  const openMinutes = timeToMinutes(hours.open_time);
-  const closeMinutes = timeToMinutes(hours.close_time);
-  const requestedStart = timeToMinutes(startTime);
-  const requestedEnd = timeToMinutes(endTime);
-
-  if (requestedStart < openMinutes || requestedEnd > closeMinutes) {
-    return NextResponse.json(
-      { error: "That time falls outside our opening hours for that day." },
-      { status: 400 }
-    );
-  }
-
-  // Re-check for a conflicting booking right before inserting, to close
-  // the race window between the customer loading available slots and
-  // submitting the form.
-  const { data: sameDayBookings, error: conflictError } = await supabase
-    .from("bookings")
-    .select("start_time, end_time")
-    .eq("booking_date", input.booking_date)
-    .neq("status", "cancelled");
-
-  if (conflictError) {
-    console.error(conflictError);
-    return NextResponse.json({ error: "Could not verify availability." }, { status: 500 });
-  }
-
-  const hasConflict = (sameDayBookings ?? []).some((existing: { start_time: string; end_time: string }) => {
-    const existingStart = timeToMinutes(existing.start_time);
-    const existingEnd = timeToMinutes(existing.end_time);
-    return requestedStart < existingEnd && requestedEnd > existingStart;
-  });
-
-  if (hasConflict) {
-    return NextResponse.json(
-      { error: "That time slot was just taken. Please choose another time." },
-      { status: 409 }
-    );
-  }
-
-  const { data: booking, error: insertError } = await supabase
-    .from("bookings")
-    .insert({
-      service_id: input.service_id,
-      customer_name: input.customer_name,
-      customer_email: input.customer_email,
-      customer_phone: input.customer_phone,
-      vehicle_rego: input.vehicle_rego.toUpperCase(),
-      vehicle_make: input.vehicle_make,
-      vehicle_model: input.vehicle_model,
-      notes: input.notes || null,
-      booking_date: input.booking_date,
-      start_time: startTime,
-      end_time: endTime,
-      status: "pending",
-    })
-    .select("*")
-    .single();
-
-  if (insertError || !booking) {
-    console.error(insertError);
-    return NextResponse.json({ error: "Could not save your booking. Please try again." }, { status: 500 });
+  if (input.website) {
+    // Honeypot filled in: almost certainly a bot posting every field.
+    return error("We couldn't accept that request.", 400, { code: "rejected" });
   }
 
   try {
-    await sendBookingReceivedEmails({ ...booking, service });
-  } catch (emailError) {
-    // The booking is already saved — a failed email should not fail the request.
-    console.error("Booking email failed:", emailError);
-  }
+    const db = createAdminClient();
 
-  return NextResponse.json({ booking }, { status: 201 });
+    // A retry of a request we already saved (double click, flaky
+    // mobile connection, browser resubmit): hand back the original.
+    if (input.client_request_id) {
+      const existing = await findBookingByRequestId(db, input.client_request_id);
+      if (existing) {
+        return NextResponse.json({ booking: publicBooking(existing, existing.service), duplicate: true }, { status: 200 });
+      }
+    }
+
+    const service = await getActiveService(db, input.service_id);
+    if (!service) {
+      return error("That service is not available.", 400, { code: "invalid", field: "service_id" });
+    }
+
+    const slot = await checkSlot(db, {
+      durationMinutes: service.duration_minutes,
+      date: input.booking_date,
+      startTime: input.start_time,
+      requireSlotGrid: true,
+    });
+    if (!slot.ok) {
+      const field = slot.reason === "taken" || slot.reason === "not_a_slot" || slot.reason === "outside_hours" ? "start_time" : "booking_date";
+      return error(slot.message, slot.reason === "taken" ? 409 : 400, {
+        code: slot.reason === "taken" ? "slot_taken" : "invalid",
+        field,
+      });
+    }
+
+    if (!(await domainAcceptsMail(input.customer_email))) {
+      return error("That email address doesn't look valid — please check for typos.", 400, {
+        code: "invalid",
+        field: "customer_email",
+      });
+    }
+
+    const phone = formatAuPhone(input.customer_phone);
+    const active = await countUpcomingActiveForContact(db, { email: input.customer_email, phone }, todayIsoDate());
+    if (active >= MAX_ACTIVE_REQUESTS_PER_CONTACT) {
+      return error(
+        "You already have several upcoming booking requests with us. Please call us to arrange another.",
+        429,
+        { code: "too_many_active" }
+      );
+    }
+
+    const { data: booking, error: insertError } = await db
+      .from("bookings")
+      .insert({
+        service_id: service.id,
+        customer_name: input.customer_name,
+        customer_email: input.customer_email,
+        customer_phone: phone,
+        vehicle_rego: input.vehicle_rego,
+        vehicle_make: input.vehicle_make,
+        vehicle_model: input.vehicle_model,
+        vehicle_year: input.vehicle_year ?? null,
+        problem_description: input.problem_description || null,
+        notes: input.notes || null,
+        booking_date: input.booking_date,
+        start_time: slot.startTime,
+        end_time: slot.endTime,
+        status: "pending",
+        source: input.source ?? "web_form",
+        client_request_id: input.client_request_id ?? null,
+      })
+      .select("*")
+      .single();
+
+    if (insertError || !booking) {
+      // Another request took this slot between our check and the
+      // insert. The database constraint caught it; tell the customer.
+      if (insertError?.code === PG_EXCLUSION_VIOLATION) {
+        return error("That time slot was just taken. Please choose another time.", 409, {
+          code: "slot_taken",
+          field: "start_time",
+        });
+      }
+      // Two copies of the same submission raced each other: return the winner.
+      if (insertError?.code === PG_UNIQUE_VIOLATION && input.client_request_id) {
+        const existing = await findBookingByRequestId(db, input.client_request_id);
+        if (existing) {
+          return NextResponse.json({ booking: publicBooking(existing, existing.service), duplicate: true }, { status: 200 });
+        }
+      }
+      console.error("Booking insert failed:", insertError);
+      return error("Could not save your booking. Please try again.", 500, { code: "server" });
+    }
+
+    // The booking is saved. Email problems are recorded, never fatal.
+    const saved = booking as Booking;
+    const emails = await sendBookingReceivedEmails({ ...saved, service });
+    await Promise.all([
+      logEmailOutcome(db, saved.id, "Customer acknowledgement email", emails.customer),
+      logEmailOutcome(db, saved.id, "Garage notification email", emails.garage),
+    ]);
+
+    return NextResponse.json(
+      { booking: publicBooking(saved, service), acknowledgementEmailSent: emails.customer.sent },
+      { status: 201 }
+    );
+  } catch (caught) {
+    if (!(caught instanceof RepositoryError)) console.error("Booking request failed:", caught);
+    return error("Something went wrong on our side. Please try again in a moment.", 500, { code: "server" });
+  }
 }

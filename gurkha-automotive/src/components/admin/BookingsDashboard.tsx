@@ -1,214 +1,156 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { formatDateDisplay, formatTimeDisplay, todayIsoDate } from "@/lib/utils";
-import StatusBadge from "@/components/admin/StatusBadge";
-import type { Booking, BookingStatus, Service } from "@/lib/types";
+import BookingCard, { type BookingRow } from "@/components/admin/BookingCard";
+import { normaliseAuPhone } from "@/lib/phone";
 
-type BookingRow = Booking & { service: Service };
-
-const FILTERS: { key: string; label: string }[] = [
-  { key: "all", label: "All" },
+const FILTERS = [
   { key: "today", label: "Today" },
   { key: "upcoming", label: "Upcoming" },
   { key: "pending", label: "Pending" },
   { key: "confirmed", label: "Confirmed" },
-  { key: "completed", label: "Completed" },
+  { key: "rejected", label: "Rejected" },
   { key: "cancelled", label: "Cancelled" },
-];
+  { key: "completed", label: "Completed" },
+  { key: "all", label: "All" },
+] as const;
 
-export default function BookingsDashboard({ initialBookings }: { initialBookings: BookingRow[] }) {
+type FilterKey = (typeof FILTERS)[number]["key"];
+
+function matchesFilter(booking: BookingRow, filter: FilterKey, today: string): boolean {
+  switch (filter) {
+    case "today":
+      return booking.booking_date === today;
+    case "upcoming":
+      return booking.booking_date >= today && (booking.status === "pending" || booking.status === "confirmed");
+    case "all":
+      return true;
+    default:
+      return booking.status === filter;
+  }
+}
+
+function matchesSearch(booking: BookingRow, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const digits = q.replace(/\D/g, "");
+  const haystack = [
+    booking.reference,
+    booking.customer_name,
+    booking.customer_email,
+    booking.vehicle_rego,
+    booking.vehicle_make,
+    booking.vehicle_model,
+    booking.service?.name ?? "",
+  ]
+    .join(" ")
+    .toLowerCase();
+  if (haystack.includes(q)) return true;
+  // Phone numbers: match on digits so "0412 345" finds "0412345678".
+  return digits.length >= 3 && normaliseAuPhone(booking.customer_phone).includes(normaliseAuPhone(digits));
+}
+
+export default function BookingsDashboard({ initialBookings, today }: { initialBookings: BookingRow[]; today: string }) {
   const [bookings, setBookings] = useState<BookingRow[]>(initialBookings);
-  const [filter, setFilter] = useState("today");
-  const today = todayIsoDate();
+  const [filter, setFilter] = useState<FilterKey>("today");
+  const [query, setQuery] = useState("");
+  const [onDate, setOnDate] = useState("");
+
+  const counts = useMemo(() => {
+    const result = {} as Record<FilterKey, number>;
+    for (const f of FILTERS) result[f.key] = bookings.filter((b) => matchesFilter(b, f.key, today)).length;
+    return result;
+  }, [bookings, today]);
 
   const filtered = useMemo(() => {
-    switch (filter) {
-      case "today":
-        return bookings.filter((b) => b.booking_date === today);
-      case "upcoming":
-        return bookings.filter((b) => b.booking_date > today && (b.status === "pending" || b.status === "confirmed"));
-      case "pending":
-      case "confirmed":
-      case "completed":
-      case "cancelled":
-        return bookings.filter((b) => b.status === filter);
-      default:
-        return bookings;
-    }
-  }, [bookings, filter, today]);
+    // Searching or picking a date looks across every booking, whatever the status chip says.
+    const searching = query.trim() !== "" || onDate !== "";
+    return bookings.filter(
+      (b) =>
+        (searching ? true : matchesFilter(b, filter, today)) &&
+        matchesSearch(b, query) &&
+        (!onDate || b.booking_date === onDate)
+    );
+  }, [bookings, filter, query, onDate, today]);
 
   function updateLocalBooking(updated: BookingRow) {
     setBookings((prev) => prev.map((b) => (b.id === updated.id ? { ...b, ...updated } : b)));
   }
 
+  const searching = query.trim() !== "" || onDate !== "";
+
   return (
     <div>
-      <div className="mb-5 flex flex-wrap gap-2">
+      <div className="mb-4 grid gap-3 sm:grid-cols-[1fr_auto]">
+        <div>
+          <label htmlFor="booking-search" className="field-label">
+            Search
+          </label>
+          <input
+            id="booking-search"
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Reference, name, phone, email, rego, vehicle…"
+            className="field-input"
+          />
+        </div>
+        <div>
+          <label htmlFor="booking-date-filter" className="field-label">
+            On date
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="booking-date-filter"
+              type="date"
+              value={onDate}
+              onChange={(e) => setOnDate(e.target.value)}
+              className="field-input sm:w-44"
+            />
+            {onDate && (
+              <button type="button" onClick={() => setOnDate("")} className="text-xs font-bold uppercase text-steel-500 hover:text-asphalt-800">
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Filter by status">
         {FILTERS.map((f) => (
           <button
             key={f.key}
             type="button"
             onClick={() => setFilter(f.key)}
+            aria-pressed={!searching && filter === f.key}
+            disabled={searching}
             className={[
-              "rounded-sm border px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors",
-              filter === f.key
+              "rounded-sm border px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors disabled:opacity-40",
+              !searching && filter === f.key
                 ? "border-amber-500 bg-amber-500 text-asphalt-900"
                 : "border-cream-300 bg-white text-steel-600 hover:border-steel-400",
             ].join(" ")}
           >
-            {f.label}
+            {f.label} <span className="ml-1 font-mono opacity-70">{counts[f.key]}</span>
           </button>
         ))}
       </div>
 
+      {searching && (
+        <p className="mb-3 text-xs text-steel-500">
+          Showing {filtered.length} matching booking{filtered.length === 1 ? "" : "s"} across all statuses.
+        </p>
+      )}
+
       {filtered.length === 0 ? (
-        <div className="card-panel p-10 text-center text-sm text-steel-500">
-          No bookings in this view.
-        </div>
+        <div className="card-panel p-10 text-center text-sm text-steel-500">No bookings in this view.</div>
       ) : (
         <div className="space-y-3">
           {filtered.map((booking) => (
-            <BookingCard key={booking.id} booking={booking} onUpdated={updateLocalBooking} />
+            <BookingCard key={booking.id} booking={booking} today={today} onUpdated={updateLocalBooking} />
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function BookingCard({
-  booking,
-  onUpdated,
-}: {
-  booking: BookingRow;
-  onUpdated: (b: BookingRow) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  const [notesDraft, setNotesDraft] = useState(booking.admin_notes ?? "");
-  const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  async function patchBooking(patch: { status?: BookingStatus; admin_notes?: string }, busyKey: string) {
-    setBusy(busyKey);
-    setError(null);
-    try {
-      const res = await fetch(`/api/bookings/${booking.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error ?? "Could not update booking.");
-      onUpdated(result.booking);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not update booking.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  return (
-    <div className="card-panel overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="flex w-full flex-wrap items-center justify-between gap-3 p-4 text-left"
-      >
-        <div className="flex flex-wrap items-center gap-3">
-          <StatusBadge status={booking.status} />
-          <span className="font-display text-sm font-semibold uppercase text-asphalt-800">
-            {booking.service?.name ?? "Unknown service"}
-          </span>
-          <span className="font-mono text-xs text-steel-500">
-            {formatDateDisplay(booking.booking_date)} · {formatTimeDisplay(booking.start_time)}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-semibold text-asphalt-800">{booking.customer_name}</span>
-          <span className="text-steel-400">{expanded ? "▲" : "▼"}</span>
-        </div>
-      </button>
-
-      {expanded && (
-        <div className="border-t border-cream-300 bg-cream-100 p-5">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Detail label="Customer" value={booking.customer_name} />
-            <Detail label="Phone" value={booking.customer_phone} />
-            <Detail label="Email" value={booking.customer_email} />
-            <Detail label="Vehicle" value={`${booking.vehicle_make} ${booking.vehicle_model}`} />
-            <Detail label="Registration" value={booking.vehicle_rego} mono />
-            <Detail label="Service" value={`${booking.service?.name} (~${booking.service?.duration_minutes} min)`} />
-            <Detail label="Date" value={formatDateDisplay(booking.booking_date)} />
-            <Detail label="Time" value={`${formatTimeDisplay(booking.start_time)} – ${formatTimeDisplay(booking.end_time)}`} />
-          </div>
-
-          {booking.notes && (
-            <div className="mt-4">
-              <p className="field-label">Customer notes</p>
-              <p className="text-sm text-steel-600">{booking.notes}</p>
-            </div>
-          )}
-
-          <div className="mt-4">
-            <label htmlFor={`admin-notes-${booking.id}`} className="field-label">Admin notes</label>
-            <textarea
-              id={`admin-notes-${booking.id}`}
-              rows={3}
-              value={notesDraft}
-              onChange={(e) => setNotesDraft(e.target.value)}
-              className="field-input resize-none"
-              placeholder="Internal notes, parts ordered, follow-ups…"
-            />
-            <button
-              type="button"
-              onClick={() => patchBooking({ admin_notes: notesDraft }, "notes")}
-              disabled={busy === "notes"}
-              className="btn-secondary mt-2 !border-steel-400/40 !text-asphalt-800 hover:!border-amber-500 hover:!text-amber-600"
-            >
-              {busy === "notes" ? "Saving…" : "Save Notes"}
-            </button>
-          </div>
-
-          {error && <p className="mt-3 rounded-sm bg-rust/10 px-3 py-2 text-sm text-rust-600">{error}</p>}
-
-          <div className="mt-5 flex flex-wrap gap-3 border-t border-cream-300 pt-4">
-            <button
-              type="button"
-              disabled={busy !== null || booking.status === "confirmed"}
-              onClick={() => patchBooking({ status: "confirmed" }, "confirmed")}
-              className="btn-dark"
-            >
-              {busy === "confirmed" ? "Confirming…" : "Confirm"}
-            </button>
-            <button
-              type="button"
-              disabled={busy !== null || booking.status === "completed"}
-              onClick={() => patchBooking({ status: "completed" }, "completed")}
-              className="btn-secondary !border-pit !text-pit-600 hover:!bg-pit hover:!text-white"
-            >
-              {busy === "completed" ? "Updating…" : "Mark Completed"}
-            </button>
-            <button
-              type="button"
-              disabled={busy !== null || booking.status === "cancelled"}
-              onClick={() => patchBooking({ status: "cancelled" }, "cancelled")}
-              className="btn-secondary !border-rust !text-rust-600 hover:!bg-rust hover:!text-white"
-            >
-              {busy === "cancelled" ? "Cancelling…" : "Cancel Booking"}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Detail({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div>
-      <p className="text-[11px] font-bold uppercase tracking-wide text-steel-400">{label}</p>
-      <p className={`text-sm font-semibold text-asphalt-800 ${mono ? "font-mono" : ""}`}>{value}</p>
     </div>
   );
 }

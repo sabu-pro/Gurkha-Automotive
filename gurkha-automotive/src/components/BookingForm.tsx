@@ -26,6 +26,12 @@ export default function BookingForm({ services }: { services: Service[] }) {
   const [slotsError, setSlotsError] = useState<string | null>(null);
 
   const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [reference, setReference] = useState<string | null>(null);
+  // One idempotency key per visit to the form: a double click or a retry
+  // after a dropped connection returns the same booking, not a second one.
+  const [requestId] = useState(() =>
+    typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : undefined
+  );
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
 
@@ -86,6 +92,8 @@ export default function BookingForm({ services }: { services: Service[] }) {
       vehicle_rego: String(data.get("vehicle_rego") ?? ""),
       vehicle_make: String(data.get("vehicle_make") ?? ""),
       vehicle_model: String(data.get("vehicle_model") ?? ""),
+      client_request_id: requestId,
+      source: "web_form",
       notes: String(data.get("notes") ?? ""),
     };
 
@@ -97,6 +105,7 @@ export default function BookingForm({ services }: { services: Service[] }) {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error ?? "Could not submit your booking.");
+      setReference(result.booking?.reference ?? null);
       setStatus("success");
     } catch (err) {
       setStatus("error");
@@ -126,6 +135,11 @@ export default function BookingForm({ services }: { services: Service[] }) {
           <strong>{selectedTime && formatTimeDisplay(selectedTime)}</strong> is pending
           confirmation. We&apos;ve emailed you the details and will confirm shortly.
         </p>
+        {reference && (
+          <p className="mt-4 text-sm text-steel-500">
+            Your booking reference: <strong className="font-mono text-asphalt-800">{reference}</strong>
+          </p>
+        )}
       </div>
     );
   }

@@ -254,3 +254,34 @@ git push -u origin main
   `src/components/Calendar.tsx`) — adjust as needed.
 - For SMS reminders or calendar sync, consider adding a provider (e.g.
   Twilio) and a scheduled Vercel Cron job / Supabase Edge Function.
+
+---
+
+## Booking assistant (chat)
+
+A floating **“Book with our assistant”** button on every public page opens a
+chat that walks customers through a booking request step by step.
+
+- **Free to run.** The conversation is a deterministic, rule-based engine
+  (`src/lib/assistant/flow.ts`) running in the browser. No AI API is called.
+- **Same rules as the booking form.** It uses `/api/availability`,
+  `/api/availability/days` and `POST /api/bookings`, so opening hours,
+  blocked dates and slot checks are always decided by the server.
+- **Requests, not confirmations.** Every submission is saved as *Pending*
+  with a reference such as `GA-7K3QX9`. Only staff confirm, from the admin
+  dashboard, and only then does the customer get a confirmation email.
+- **Optional AI later.** `src/lib/assistant/providers/` defines a provider
+  interface (Claude, OpenAI, Gemini, Ollama, …) selected by the server-only
+  `AI_PROVIDER` env var. Unset = rule-based only. See the comments in
+  `providers/index.ts`.
+
+## Tests
+
+```bash
+npm test            # unit, API-route and database (PGlite) tests
+npm run type-check
+npm run lint
+```
+
+The database tests run the real migration files against an in-process
+Postgres — they never touch your Supabase project.

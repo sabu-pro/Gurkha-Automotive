@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SiteChrome from "@/components/SiteChrome";
+import BookingAssistant from "@/components/assistant/BookingAssistant";
 import { BUSINESS, getLocalBusinessJsonLd } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -70,6 +71,9 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <SiteChrome>
           <Footer />
+        </SiteChrome>
+        <SiteChrome>
+          <BookingAssistant />
         </SiteChrome>
       </body>
     </html>

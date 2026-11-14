@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getAdminSession } from "@/lib/auth";
 import { serviceSchema } from "@/lib/validation";
 import type { Service } from "@/lib/types";
 
@@ -25,12 +25,9 @@ function revalidateServicePages() {
  * insert/update/delete policy on public.services at all.
  */
 async function requireAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  return supabase;
+  // Signed in AND listed in admin_users (see src/lib/auth.ts).
+  const session = await getAdminSession();
+  return session.ok ? session.supabase : null;
 }
 
 function parseServiceForm(formData: FormData) {
